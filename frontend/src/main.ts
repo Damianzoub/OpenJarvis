@@ -1,22 +1,28 @@
-import { invoke } from "@tauri-apps/api/core";
+const messagesEl = document.querySelector<HTMLDivElement>("#messages")!;
+const formEl = document.querySelector<HTMLFormElement>("#chat-form")!;
+const inputEl = document.querySelector<HTMLInputElement>("#chat-input")!;
 
-let greetInputEl: HTMLInputElement | null;
-let greetMsgEl: HTMLElement | null;
-
-async function greet() {
-  if (greetMsgEl && greetInputEl) {
-    // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
-    greetMsgEl.textContent = await invoke("greet", {
-      name: greetInputEl.value,
-    });
-  }
+function addMessage(text: string, sender: "user" | "jarvis") {
+  const p = document.createElement("p");
+  p.textContent = `${sender === "user" ? "You" : "Jarvis"}: ${text}`;
+  messagesEl.appendChild(p);
 }
 
-window.addEventListener("DOMContentLoaded", () => {
-  greetInputEl = document.querySelector("#greet-input");
-  greetMsgEl = document.querySelector("#greet-msg");
-  document.querySelector("#greet-form")?.addEventListener("submit", (e) => {
-    e.preventDefault();
-    greet();
+formEl.addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  const message = inputEl.value.trim();
+  if (!message) return;
+
+  addMessage(message, "user");
+  inputEl.value = "";
+
+  const response = await fetch("http://localhost:8000/chat", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ message }),
   });
+
+  const data = await response.json();
+  addMessage(data.reply, "jarvis");
 });
