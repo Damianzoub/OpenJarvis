@@ -5,7 +5,7 @@ load_dotenv()
 
 
 class Settings:
-    ACTIVE_PROVIDER: str = os.getenv("ACTIVE_PROVIDER", "anthropic")
+    ACTIVE_PROVIDER: str = os.getenv("ACTIVE_PROVIDER", "")
     MODEL: str = os.getenv("MODEL", "claude-sonnet-4-6")
 
     ANTHROPIC_API_KEY: str = os.getenv("ANTHROPIC_API_KEY", "")
@@ -19,7 +19,8 @@ class Settings:
     OLLAMA_MODEL: str = os.getenv("OLLAMA_MODEL", "llama3.1:8b")
 
     BROWSER_USE_MAX_STEPS: int = int(os.getenv("BROWSER_USE_MAX_STEPS", "20"))
-    SEARCH_ROOT: str = os.getenv("SEARCH_ROOT", "~/Documents")
+    SEARCH_ROOT: str = os.getenv("SEARCH_ROOT","~/Documents")
 
 
 settings = Settings()
+

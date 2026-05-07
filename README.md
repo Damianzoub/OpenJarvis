@@ -3,28 +3,26 @@
 
   # OpenJarvis
 
-  An open-source modular AI desktop assistant framework. Build your own Jarvis — step by step, learning the Anthropic Agent SDK along the way.
+  An open-source modular AI desktop assistant — built to learn the [Anthropic SDK](https://github.com/anthropics/anthropic-sdk-python) and [Browser Use Agent SDK](https://github.com/browser-use/agent-sdk) hands-on, phase by phase.
 </div>
 
-> **Current state: v0** — Basic FastAPI backend with a single `/chat` endpoint. No agent loop or tools yet. That's what we're building next.
+---
+
+> **Current state: v0** — Backend running with `/chat` + `/system` endpoints, Iron Man HUD frontend, auto-starts on login. Agent loop (Phase 1) is in progress.
 
 ---
 
-## Project Goal
-
-Build a personal AI assistant that can actually *do things* — search your files, remember facts, open apps, send emails — not just chat. Built with the [Anthropic Python SDK](https://github.com/anthropics/anthropic-sdk-python) agent (tool-use) pattern so every phase teaches you something real.
-
----
-
-## What Exists Now (v0)
+## What's Built
 
 | Component | Status |
 |---|---|
-| FastAPI backend (`/chat` endpoint) | Working |
-| Claude or Ollama chat passthrough | Working |
-| Tauri frontend (scaffolded) | Not wired up |
-| Agent loop (tool-use) | **Not built yet** |
-| Tools (search, memory, etc.) | **Not built yet** |
+| FastAPI backend — `/chat`, `/system` endpoints | Working |
+| Iron Man HUD frontend (Tauri + Vite + TypeScript) | Built, needs Rust to run |
+| Sidebar — live clock, CPU/RAM bars, shortcuts | Working |
+| Voice input (Web Speech API) | Working |
+| Multi-provider LLM config (Claude, GPT, Gemini, Groq, Ollama…) | Configured |
+| Auto-start on login via macOS LaunchAgent | Working |
+| Agent loop + tools | **In progress (Phase 1)** |
 
 ---
 
@@ -33,51 +31,58 @@ Build a personal AI assistant that can actually *do things* — search your file
 ### Backend
 
 ```bash
+conda activate main_env        # or your env of choice
 cd backend
-python -m venv .venv && source .venv/bin/activate
-pip install -r requirements.txt
-cp .env.example .env   # add ANTHROPIC_API_KEY
+cp .env.example .env           # fill in your API keys
 uvicorn main:app --reload
 ```
 
-Test:
+Auto-start on login (macOS):
 ```bash
-curl -X POST http://localhost:8000/chat \
-  -H "Content-Type: application/json" \
-  -d '{"message": "Hello"}'
+launchctl load ~/Library/LaunchAgents/com.openjarvis.backend.plist
+```
+
+Logs:
+```bash
+tail -f /tmp/jarvis-backend.log
+tail -f /tmp/jarvis-backend-error.log
 ```
 
 ### Frontend (Tauri)
 
-**Prerequisites:**
-- [Node.js](https://nodejs.org) (v18+)
-- [Rust](https://rustup.rs) (`curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh`)
-
+**Prerequisites:** [Node.js v18+](https://nodejs.org) · [Rust](https://rustup.rs)
 
 ```bash
 cd frontend
 npm install
-npm run tauri dev   # starts both Vite and Tauri
+npm run tauri dev
 ```
 
 ---
 
 ## Build Phases
 
-| Phase | What You Learn | Status |
+| Phase | Focus | Status |
 |---|---|---|
-| 1 | Agent loop, tool-use pattern, tool auto-discovery | **In progress** |
-| 2 | SQLite memory, plugin SDK, MCP integration | Planned |
-| 3 | Tauri popup + global hotkey | Planned |
-| 4 | Voice input (Whisper) | Planned |
-| 5 | Email, calendar, browser automation | Planned |
+| 1 | Anthropic tool-use loop + Browser Use + search tool | **In progress** |
+| 2 | SQLite memory, MCP integration | Planned |
+| 3 | Tauri popup wired to backend, global hotkey | Planned |
+| 4 | Voice input via Whisper (server-side) | Planned |
+| 5 | Email, calendar tools | Planned |
 
 ---
 
-## Architecture
+## Adding a Tool
 
-See [CLAUDE.md](CLAUDE.md) for the full architecture, coding standards, and agent loop design.
+Create `backend/tools/your_tool.py`, subclass `ToolPlugin`, restart — the registry auto-discovers it. See [SKILLS.md](SKILLS.md) for the step-by-step guide and [CLAUDE.md](CLAUDE.md) for the full architecture.
 
-## Adding a Tool (Phase 1+)
+---
 
-Create `backend/tools/your_tool.py`, subclass `ToolPlugin`, restart. See [CLAUDE.md](CLAUDE.md) and [SKILLS.md](SKILLS.md).
+## Supported LLM Providers
+
+Configure in `backend/.env`:
+
+```
+ACTIVE_PROVIDER=anthropic   # anthropic | openai | gemini | groq | mistral | ollama
+MODEL=claude-sonnet-4-6
+```
