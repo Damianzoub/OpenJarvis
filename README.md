@@ -66,7 +66,7 @@ npm run tauri dev
 |---|---|---|
 | 1 | Browser Use + search tool | **In progress** |
 | 2 | SQLite memory, MCP integration | Planned |
-| 3 | Tauri popup wired to backend, global hotkey | Planned |
+| 3 | Rust install → native Tauri window, global hotkey, system tray | Planned |
 | 4 | Voice input via Whisper (server-side) | Planned |
 | 5 | Email, calendar tools | Planned |
 
