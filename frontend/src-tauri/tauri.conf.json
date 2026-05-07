@@ -13,9 +13,12 @@
     "withGlobalTauri": true,
     "windows": [
       {
-        "title": "frontend",
-        "width": 800,
-        "height": 600
+        "title": "J.A.R.V.I.S.",
+        "width": 860,
+        "height": 660,
+        "decorations": false,
+        "alwaysOnTop": true,
+        "resizable": false
       }
     ],
     "security": {

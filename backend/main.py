@@ -1,15 +1,23 @@
 from fastapi import FastAPI
-from routes.chat import router
-import uvicorn
+from fastapi.middleware.cors import CORSMiddleware
+from routes.chat import router as chat_router
+from routes.system import system_router
 from dotenv import load_dotenv
 
 load_dotenv()
 
-app = FastAPI(title='jarvis application')
+app = FastAPI(title="J.A.R.V.I.S.")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 @app.get("/")
-@app.get("/home")
 def health():
-    return {"ok":True}
+    return {"ok": True}
 
-app.include_router(router)
+app.include_router(chat_router)
+app.include_router(system_router)

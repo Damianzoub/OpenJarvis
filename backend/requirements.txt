@@ -1,6 +1,13 @@
 fastapi
-uvicorn
+uvicorn[standard]
 pydantic
-anthropic
+pydantic-settings
+anthropic>=0.40.0
 python-dotenv
 openai
+httpx
+psutil
+
+# Browser Use agent SDK
+browser-use
+playwright
