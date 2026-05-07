@@ -3,12 +3,12 @@
 
   # OpenJarvis
 
-  An open-source modular AI desktop assistant — built to learn the [Anthropic SDK](https://github.com/anthropics/anthropic-sdk-python) and [Browser Use Agent SDK](https://github.com/browser-use/agent-sdk) hands-on, phase by phase.
+  An open-source modular AI desktop assistant — built to learn the[Browser Use Agent SDK](https://github.com/browser-use/agent-sdk) hands-on, phase by phase.
 </div>
 
 ---
 
-> **Current state: v0** — Backend running with `/chat` + `/system` endpoints, Iron Man HUD frontend, auto-starts on login. Agent loop (Phase 1) is in progress.
+> **Current state: v0** — Backend running with `/chat` + `/system` endpoints, Iron Man Style HUD frontend, auto-starts on login. Agent loop (Phase 1) is in progress.
 
 ---
 
@@ -64,7 +64,7 @@ npm run tauri dev
 
 | Phase | Focus | Status |
 |---|---|---|
-| 1 | Anthropic tool-use loop + Browser Use + search tool | **In progress** |
+| 1 | Browser Use + search tool | **In progress** |
 | 2 | SQLite memory, MCP integration | Planned |
 | 3 | Tauri popup wired to backend, global hotkey | Planned |
 | 4 | Voice input via Whisper (server-side) | Planned |
