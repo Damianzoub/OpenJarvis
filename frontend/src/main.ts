@@ -182,3 +182,16 @@ function toggleMic() {
 }
 
 micBtn.addEventListener("click", toggleMic);
+
+// ── Window close guard ─────────────────────────────────────
+(async () => {
+  const { getCurrentWindow } = await import("@tauri-apps/api/window");
+  const appWindow = getCurrentWindow();
+  await appWindow.onCloseRequested(async (event) => {
+    event.preventDefault();
+    const confirmed = confirm("Close Jarvis?");
+    if (confirmed) {
+      await appWindow.destroy();
+    }
+  });
+})();
