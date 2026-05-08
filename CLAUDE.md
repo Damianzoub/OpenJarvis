@@ -73,7 +73,7 @@ OpenJarvis/
 | Layer | Tech |
 |---|---|
 | Backend | Python 3.11+, FastAPI, Pydantic v2 |
-| Agent loop | `anthropic` SDK tool-use pattern |
+| Agent loop | `bu_agent_sdk` — ALL agents must use this, never raw OpenAI/Anthropic loops |
 | Browser agent | `browser-use` + `playwright` (Chromium) |
 | Settings | plain `os.getenv` + `python-dotenv` |
 | Memory | JSON file (Phase 1), SQLite (Phase 2) |
@@ -121,6 +121,16 @@ Key SDK things you learn building this:
 - `response.stop_reason` — how to know if Claude wants a tool
 - `tool_use` content blocks — how Claude sends back tool name + arguments
 - `tool_result` messages — how to feed results back correctly
+
+---
+
+## Agent Rule — ALWAYS use bu_agent_sdk
+
+Every agent (orchestrator fallback, filesystem, browser, memory, etc.) must use `bu_agent_sdk`:
+- Tools → `@tool("description")` decorator on async functions
+- Agents → `Agent(llm=ChatOpenAILike(...), tools=[...])` 
+- Never write a raw `for` loop calling the LLM directly inside an agent
+- Never use `AsyncOpenAI` or `AsyncAnthropic` directly inside agent files
 
 ---
 

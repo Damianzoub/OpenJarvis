@@ -55,6 +55,7 @@ document.addEventListener("keydown", (e) => {
   if (e.ctrlKey && e.key === "l") {
     e.preventDefault();
     messagesEl.innerHTML = "";
+    chatHistory.length=0;
   }
   if (e.ctrlKey && e.key === "m") {
     e.preventDefault();
@@ -87,7 +88,10 @@ function addMessage(text: string, sender: "user" | "jarvis"): HTMLElement {
   return div;
 }
 
+const chatHistory:{role:string,content:string}[] = [];
+
 async function sendMessage(message: string) {
+  chatHistory.push({ role: "user", content: message });
   addMessage(message, "user");
   inputEl.value = "";
   inputEl.disabled = true;
@@ -97,20 +101,50 @@ async function sendMessage(message: string) {
   setStatus("PROCESSING...");
 
   try {
-    const res  = await fetch("http://localhost:8000/chat", {
-      method:  "POST",
+    const res = await fetch("http://localhost:8000/chat", {
+      method: "POST",
       headers: { "Content-Type": "application/json" },
-      body:    JSON.stringify({ message }),
+      body: JSON.stringify({ messages: chatHistory }),
     });
-    const data = await res.json();
-    thinking.classList.remove("typing");
-    thinking.querySelector<HTMLSpanElement>(".text")!.textContent = data.reply;
-    setStatus("SYSTEM ONLINE");
+
+    const reader = res.body!.getReader();
+    const decoder = new TextDecoder();
+    let buffer = "";
+    let reply = "";
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      buffer += decoder.decode(value, { stream: true });
+      const blocks = buffer.split("\n\n");
+      buffer = blocks.pop() ?? "";
+      for (const block of blocks) {
+        for (const line of block.split("\n")) {
+          if (!line.startsWith("data: ")) continue;
+          try {
+            const data = JSON.parse(line.slice(6));
+            if (data.type === "status") {
+              setStatus(data.content.toUpperCase());
+            } else if (data.type === "tool") {
+              thinking.querySelector<HTMLSpanElement>(".text")!.textContent = data.content;
+            } else if (data.type === "text") {
+              reply = data.content;
+              thinking.classList.remove("typing");
+              thinking.querySelector<HTMLSpanElement>(".text")!.textContent = reply;
+            } else if (data.type === "done") {
+              chatHistory.push({ role: "assistant", content: reply });
+              setStatus("SYSTEM ONLINE");
+            }
+          } catch { /* skip malformed chunk */ }
+        }
+      }
+    }
   } catch {
     thinking.classList.remove("typing");
     thinking.querySelector<HTMLSpanElement>(".text")!.textContent =
       "Connection failed. Is the backend running?";
     setStatus("BACKEND OFFLINE");
+    chatHistory.pop();
   } finally {
     inputEl.disabled = false;
     inputEl.focus();

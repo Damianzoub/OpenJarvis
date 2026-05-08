@@ -7,7 +7,7 @@ python-dotenv
 openai
 httpx
 psutil
-
+bu-agent-sdk
 # Browser Use agent SDK
 browser-use
 playwright

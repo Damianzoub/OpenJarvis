@@ -1,0 +1,6 @@
+{
+  "facts": [
+    "The user uses a Windows operating system and has a ~/Desktop directory structure.",
+    "The user does not have Python installed on their computer."
+  ]
+}

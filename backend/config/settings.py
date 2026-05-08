@@ -16,7 +16,7 @@ class Settings:
     TOGETHER_API_KEY: str = os.getenv("TOGETHER_API_KEY", "")
 
     OLLAMA_BASE_URL: str = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434/v1")
-    OLLAMA_MODEL: str = os.getenv("OLLAMA_MODEL", "llama3.1:8b")
+    OLLAMA_MODEL: str = os.getenv("OLLAMA_MODEL", "qwen2.5:7b")
 
     BROWSER_USE_MAX_STEPS: int = int(os.getenv("BROWSER_USE_MAX_STEPS", "20"))
     SEARCH_ROOT: str = os.getenv("SEARCH_ROOT","~/Documents")
