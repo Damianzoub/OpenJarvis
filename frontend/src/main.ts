@@ -1,3 +1,7 @@
+import { marked } from 'marked';
+
+marked.use({ breaks: true, gfm: true });
+
 const messagesEl  = document.querySelector<HTMLDivElement>("#messages")!;
 const formEl      = document.querySelector<HTMLFormElement>("#chat-form")!;
 const inputEl     = document.querySelector<HTMLInputElement>("#chat-input")!;
@@ -69,6 +73,10 @@ document.addEventListener("keydown", (e) => {
 // ── Chat helpers ───────────────────────────────────────────
 function setStatus(text: string) { statusEl.textContent = text; }
 
+function renderMarkdown(text: string): string {
+  return marked.parse(text) as string;
+}
+
 function addMessage(text: string, sender: "user" | "jarvis"): HTMLElement {
   const div = document.createElement("div");
   div.className = `message ${sender}`;
@@ -77,9 +85,14 @@ function addMessage(text: string, sender: "user" | "jarvis"): HTMLElement {
   label.className = "label";
   label.textContent = sender === "user" ? "YOU" : "JARVIS";
 
-  const content = document.createElement("span");
+  const content = document.createElement("div");
   content.className = "text";
-  content.textContent = text;
+
+  if (sender === "jarvis" && text) {
+    content.innerHTML = renderMarkdown(text);
+  } else {
+    content.textContent = text;
+  }
 
   div.appendChild(label);
   div.appendChild(content);
@@ -130,7 +143,7 @@ async function sendMessage(message: string) {
             } else if (data.type === "text") {
               reply = data.content;
               thinking.classList.remove("typing");
-              thinking.querySelector<HTMLSpanElement>(".text")!.textContent = reply;
+              thinking.querySelector<HTMLDivElement>(".text")!.innerHTML = renderMarkdown(reply);
             } else if (data.type === "emails") {
               thinking.classList.remove("typing");
               const el = thinking.querySelector<HTMLSpanElement>(".text")!;
