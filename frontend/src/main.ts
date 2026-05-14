@@ -131,6 +131,17 @@ async function sendMessage(message: string) {
               reply = data.content;
               thinking.classList.remove("typing");
               thinking.querySelector<HTMLSpanElement>(".text")!.textContent = reply;
+            } else if (data.type === "emails") {
+              thinking.classList.remove("typing");
+              const el = thinking.querySelector<HTMLSpanElement>(".text")!;
+              el.innerHTML = data.content.map((e: any) => `
+                <div class="email-card">
+                  <div class="email-from">${e.from}</div>
+                  <div class="email-subject">${e.subject}</div>
+                  <div class="email-preview">${e.snippet}</div>
+                </div>
+              `).join("");
+              chatHistory.push({ role: "assistant", content: "Showed recent emails." });
             } else if (data.type === "done") {
               chatHistory.push({ role: "assistant", content: reply });
               setStatus("SYSTEM ONLINE");

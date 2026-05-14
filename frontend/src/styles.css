@@ -295,3 +295,15 @@ button[type="submit"]:active, .mic-btn:active { background: #00d4ff15; }
 .hud-footer { display: flex; justify-content: space-between; padding-top: 6px; font-size: 8px; letter-spacing: 2px; color: #00d4ff44; text-transform: uppercase; }
 .blink { animation: status-blink 4s step-end infinite; }
 @keyframes status-blink { 0%,85%,100%{ opacity:.4; } 88%,97%{ opacity:1; color: var(--cyan); } }
+
+/* ── Email cards ──────────────────────────────────────────── */
+.email-card {
+  border: 1px solid var(--border);
+  border-left: 2px solid var(--cyan);
+  background: var(--surface);
+  padding: 6px 10px;
+  margin: 4px 0;
+}
+.email-from    { color: var(--cyan); font-size: 10px; letter-spacing: 1px; text-transform: uppercase; }
+.email-subject { color: var(--text); font-size: 12px; margin: 2px 0; }
+.email-preview { color: #4a6a7a; font-size: 10px; }
