@@ -212,11 +212,13 @@ async def list_events(days:int=7)->str:
     cached = redis_client.get("today_events")
     if cached:
         events = json.loads(cached)
-        if not events:
-            return "No events found."
-        return "\n".join([f"{e['summary']} at {e['start'].get('dateTime', e['start'].get('date'))}" for e in events])
+        if events:
+            return "\n".join([f"{e['summary']} at {e['start'].get('dateTime', e['start'].get('date'))}" for e in events])
     return await _list_events(days=days)
 
 @tool("Create a calendar event in the user's Google Calendar. Call this when the user asks to create an event.")
 async def create_event(title:str, start:str, end:str)->str:
-    return await _create_event(title, start, end)
+    print(f"[CALENDAR] create_event called: {title!r} {start} -> {end}")
+    result = await _create_event(title, start, end)
+    redis_client.delete("today_events")
+    return result

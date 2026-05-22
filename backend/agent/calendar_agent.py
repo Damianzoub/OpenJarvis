@@ -1,8 +1,7 @@
-import os 
 from bu_agent_sdk import Agent
 from bu_agent_sdk.llm.openai.like import ChatOpenAILike
 from tools.calendar import list_events, create_event
-from prompts.calendar_prompt import CALENDAR_PROMPT
+from prompts.calendar_prompt import get_calendar_prompt
 
 def make_agenda_agent():
     return Agent(
@@ -12,6 +11,6 @@ def make_agenda_agent():
             api_key="ollama",
         ),
         tools=[list_events, create_event],
-        system_prompt=CALENDAR_PROMPT,
+        system_prompt=get_calendar_prompt(),
     )
 

@@ -15,10 +15,17 @@ def _service():
 @tool("Read recent emails from the user's Gmail account. Call this when the user asks to check their email.")
 async def read_emails(max_results: int = 5) -> str:
     cached = redis_client.get("recent_emails")
-    if cached:
-        emails = json.loads(cached)[:max_results]
-        return "EMAILS:" + json.dumps(emails)
-    return "No recent emails cached yet. Try again in a few seconds."
+    if not cached:
+        return "No recent emails cached yet. Try again in a few seconds."
+    emails = json.loads(cached)[:max_results]
+    lines = ["## Recent Emails\n"]
+    for email in emails:
+        lines.append(f"**From:** {email['from']}")
+        lines.append(f"**Subject:** {email['subject']}")
+        if email.get('snippet'):
+            lines.append(f"> {email['snippet']}")
+        lines.append("---")
+    return "\n".join(lines)
 
 @tool("Create a draft email in the user's Gmail account. Call this when the user asks to compose an email.")
 async def create_draft(to:str, subject:str, body:str)->str:

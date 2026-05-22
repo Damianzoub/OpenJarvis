@@ -20,6 +20,7 @@ class Settings:
 
     BROWSER_USE_MAX_STEPS: int = int(os.getenv("BROWSER_USE_MAX_STEPS", "20"))
     SEARCH_ROOT: str = os.getenv("SEARCH_ROOT","~/Documents")
+    NEWS_API_KEY: str = os.getenv("NEWS_API_KEY")
 
 
 settings = Settings()

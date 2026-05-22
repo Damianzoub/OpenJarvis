@@ -2,6 +2,8 @@ import os
 import httpx 
 from dotenv import load_dotenv
 
+from bu_agent_sdk.tools import tool
+
 load_dotenv()
 
 class WeatherTool:
@@ -37,3 +39,12 @@ class WeatherTool:
             f"It is {temp}°C, feels like {feels}°C. "
             f"Humidity is {humidity}% and wind speed is {wind} km/h."
         )
+    
+
+async def _get_weather(location:str)->str:
+    weather_tool = WeatherTool()
+    return await weather_tool.get_current_weather(location)
+
+@tool("Get the current weather for a location. Call this when the user asks about weather, temperature, or conditions outside.")
+async def get_weather(location:str)->str:
+    return await _get_weather(location)
