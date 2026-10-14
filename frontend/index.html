@@ -3,19 +3,21 @@
   <head>
     <meta charset="UTF-8" />
     <link rel="stylesheet" href="/src/styles.css" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <title>J.A.R.V.I.S.</title>
     <script type="module" src="/src/main.ts" defer></script>
   </head>
   <body>
-    <div class="scanlines"></div>
+    <div class="scanlines" aria-hidden="true"></div>
 
     <div class="app">
 
+      <!-- Backdrop — mobile only, closes the sidebar drawer on tap -->
+      <button type="button" id="sidebar-backdrop" class="sidebar-backdrop" aria-hidden="true" tabindex="-1"></button>
+
       <!-- ── Left sidebar ─────────────────────────────── -->
-      <aside class="sidebar">
-        <span class="corner tl"></span>
-        <span class="corner bl"></span>
+      <aside class="sidebar" id="sidebar-panel">
+        <span class="corner bl" aria-hidden="true"></span>
 
         <section class="sidebar-section">
           <div class="sidebar-label">CLOCK</div>
@@ -53,18 +55,18 @@
 
       <!-- ── Main HUD ───────────────────────────────── -->
       <main class="hud">
-        <span class="corner tr"></span>
-        <span class="corner br"></span>
+        <span class="corner br" aria-hidden="true"></span>
 
         <header class="hud-header">
-          <div class="arc-ring">
+          <button type="button" id="sidebar-toggle" class="sidebar-toggle" aria-label="System info" aria-expanded="false" aria-controls="sidebar-panel">☰</button>
+          <div class="arc-ring" aria-hidden="true">
             <div class="arc-core"></div>
           </div>
           <div class="hud-title">
             <h1>J.A.R.V.I.S.</h1>
             <p class="subtitle">Just A Rather Very Intelligent System</p>
           </div>
-          <div class="status-dots">
+          <div class="status-dots" aria-hidden="true">
             <span class="dot active"></span>
             <span class="dot active"></span>
             <span class="dot" id="mic-dot"></span>
@@ -73,7 +75,7 @@
 
         <div class="divider"></div>
 
-        <div id="messages" class="messages">
+        <div id="messages" class="messages" aria-live="polite">
           <div class="message jarvis">
             <span class="label">JARVIS</span>
             <span class="text">Online and ready, sir. How can I assist you?</span>
@@ -81,6 +83,10 @@
         </div>
 
         <div class="divider"></div>
+
+        <div id="connection-banner" class="connection-banner" role="alert" hidden>
+          <span class="connection-banner-text" id="connection-banner-text"></span>
+        </div>
 
         <form id="chat-form" class="input-row">
           <span class="prompt-symbol">&gt;_</span>
@@ -91,7 +97,7 @@
 
         <div class="hud-footer">
           <span class="footer-item">DAMIANOS INDUSTRIES</span>
-          <span class="footer-item blink" id="status-text">SYSTEM ONLINE</span>
+          <span class="footer-item blink" id="status-text" role="status" aria-live="polite">SYSTEM ONLINE</span>
           <span class="footer-item">v0.0.0</span>
         </div>
       </main>

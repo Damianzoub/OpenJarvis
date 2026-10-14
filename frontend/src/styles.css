@@ -2,17 +2,18 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  --cyan:      #00d4ff;
-  --cyan-dim:  #00d4ff33;
-  --cyan-glow: 0 0 8px #00d4ff, 0 0 20px #00d4ff55;
-  --red:       #ff4d00;
-  --green:     #00ff9d;
-  --bg:        #060a12;
-  --surface:   #0b1220;
-  --border:    #00d4ff33;
-  --text:      #a8d8ea;
-  --font:      'Courier New', Courier, monospace;
+  --cyan:          #00d4ff;
+  --cyan-dim:      #00d4ff33;
+  --cyan-dim-text: #0098c2; /* solid, not alpha — 5.59:1 on --surface, clears the 4.5:1 text minimum */
+  --cyan-glow:     0 0 8px #00d4ff, 0 0 20px #00d4ff55;
+  --red:           #ff4d00;
+  --bg:            #060a12;
+  --surface:       #0b1220;
+  --border:        #00d4ff33;
+  --text:          #a8d8ea;
+  --font:          'Courier New', Courier, monospace;
 }
+
 
 html, body { height: 100%; background: var(--bg); color: var(--text); font-family: var(--font); font-size: 13px; overflow: hidden; }
 
@@ -30,13 +31,13 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 }
 
 /* ── Shared corner brackets ───────────────────────────────── */
+/* Bottom only: with decorations:true the native title bar now owns the top
+   edge, so top brackets would sit against it rather than framing the HUD. */
 .corner {
   position: absolute;
   width: 14px; height: 14px;
   border-color: var(--cyan); border-style: solid;
 }
-.corner.tl { top: 6px;    left: 6px;   border-width: 2px 0 0 2px; }
-.corner.tr { top: 6px;    right: 6px;  border-width: 2px 2px 0 0; }
 .corner.bl { bottom: 6px; left: 6px;   border-width: 0 0 2px 2px; }
 .corner.br { bottom: 6px; right: 6px;  border-width: 0 2px 2px 0; }
 
@@ -59,7 +60,7 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 .sidebar-section { padding: 10px 0; }
 
 .sidebar-label {
-  font-size: 9px;
+  font-size: 10px;
   letter-spacing: 3px;
   color: var(--cyan);
   text-shadow: var(--cyan-glow);
@@ -82,9 +83,9 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
   line-height: 1.1;
 }
 .clock-date {
-  font-size: 9px;
+  font-size: 10px;
   letter-spacing: 1px;
-  color: #00d4ff77;
+  color: var(--cyan-dim-text);
   margin-top: 4px;
   text-transform: uppercase;
 }
@@ -97,9 +98,9 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
   margin-bottom: 8px;
 }
 .stat-name {
-  font-size: 9px;
+  font-size: 10px;
   letter-spacing: 1px;
-  color: #00d4ff99;
+  color: var(--cyan-dim-text);
   width: 26px;
   flex-shrink: 0;
 }
@@ -121,18 +122,19 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 }
 .stat-fill.high { background: var(--red); box-shadow: 0 0 6px var(--red); }
 .stat-val {
-  font-size: 9px;
+  font-size: 10px;
   letter-spacing: 1px;
   color: var(--cyan);
-  width: 28px;
+  width: 30px;
   text-align: right;
   flex-shrink: 0;
 }
+.stat-val.high { color: var(--red); font-weight: 700; }
 .stat-detail {
-  font-size: 8px;
-  color: #00d4ff44;
+  font-size: 10px;
+  color: var(--cyan-dim-text);
   letter-spacing: 1px;
-  margin-top: -4px;
+  margin-top: -2px;
   margin-bottom: 4px;
 }
 
@@ -144,13 +146,13 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
   margin-bottom: 7px;
 }
 .shortcut-row span {
-  font-size: 9px;
-  color: #00d4ff66;
+  font-size: 10px;
+  color: var(--cyan-dim-text);
   letter-spacing: 1px;
 }
 kbd {
   font-family: var(--font);
-  font-size: 8px;
+  font-size: 10px;
   letter-spacing: 1px;
   color: var(--cyan);
   border: 1px solid var(--border);
@@ -204,7 +206,7 @@ kbd {
 
 .hud-title { flex: 1; }
 .hud-title h1 { font-size: 20px; font-weight: 700; letter-spacing: 6px; color: var(--cyan); text-shadow: var(--cyan-glow); }
-.subtitle { font-size: 9px; letter-spacing: 2px; color: #00d4ff77; text-transform: uppercase; margin-top: 2px; }
+.subtitle { font-size: 10px; letter-spacing: 2px; color: var(--cyan-dim-text); text-transform: uppercase; margin-top: 2px; }
 
 .status-dots { display: flex; flex-direction: column; gap: 5px; }
 .dot { width: 7px; height: 7px; border-radius: 50%; border: 1px solid var(--cyan); background: transparent; }
@@ -239,11 +241,11 @@ kbd {
 
 .message .label {
   flex-shrink: 0;
-  font-size: 8px;
+  font-size: 10px;
   letter-spacing: 2px;
   font-weight: 700;
   padding-top: 4px;
-  width: 48px;
+  width: 52px;
   text-align: right;
   font-family: var(--font);
 }
@@ -327,7 +329,7 @@ kbd {
   background: #00d4ff0d;
   color: var(--cyan);
   letter-spacing: 1px;
-  font-size: 9px;
+  font-size: 10px;
   text-transform: uppercase;
   padding: 6px 10px;
   border: 1px solid #00d4ff22;
@@ -345,6 +347,23 @@ kbd {
 /* Typing cursor */
 .typing .text::after { content: '▋'; color: var(--cyan); animation: cursor-blink .8s step-end infinite; }
 @keyframes cursor-blink { 0%,100%{ opacity:1; } 50%{ opacity:0; } }
+
+/* Connection banner — surfaced near the input, not buried in the footer */
+.connection-banner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+  padding: 7px 10px;
+  border: 1px solid var(--red);
+  background: #ff4d0012;
+  color: var(--red);
+  font-size: 11px;
+  letter-spacing: 1px;
+}
+.connection-banner[hidden] { display: none; }
+.connection-banner::before { content: '⚠'; flex-shrink: 0; }
+.connection-banner-text { flex: 1; }
 
 /* Input row */
 .input-row { display: flex; align-items: center; gap: 8px; padding: 10px 0 6px; }
@@ -374,16 +393,22 @@ button[type="submit"],
   border: 1px solid var(--cyan);
   color: var(--cyan);
   font-family: var(--font);
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 700;
   letter-spacing: 2px;
-  padding: 5px 12px;
+  padding: 9px 14px;
+  min-height: 28px;
   cursor: pointer;
   transition: background .15s, box-shadow .15s;
   flex-shrink: 0;
 }
 button[type="submit"]:hover, .mic-btn:hover { background: var(--cyan-dim); box-shadow: var(--cyan-glow); }
 button[type="submit"]:active, .mic-btn:active { background: #00d4ff15; }
+button[type="submit"]:focus-visible,
+.mic-btn:focus-visible {
+  outline: 2px solid var(--cyan);
+  outline-offset: 2px;
+}
 
 .mic-btn.listening {
   border-color: var(--red);
@@ -396,18 +421,111 @@ button[type="submit"]:active, .mic-btn:active { background: #00d4ff15; }
 .mic-btn.unavailable { opacity: .35; cursor: not-allowed; }
 
 /* Footer */
-.hud-footer { display: flex; justify-content: space-between; padding-top: 6px; font-size: 8px; letter-spacing: 2px; color: #00d4ff44; text-transform: uppercase; }
+.hud-footer { display: flex; justify-content: space-between; padding-top: 6px; font-size: 10px; letter-spacing: 2px; color: var(--cyan-dim-text); text-transform: uppercase; }
 .blink { animation: status-blink 4s step-end infinite; }
 @keyframes status-blink { 0%,85%,100%{ opacity:.4; } 88%,97%{ opacity:1; color: var(--cyan); } }
 
-/* ── Email cards ──────────────────────────────────────────── */
-.email-card {
-  border: 1px solid var(--border);
-  border-left: 2px solid var(--cyan);
-  background: var(--surface);
-  padding: 6px 10px;
-  margin: 4px 0;
+/* ── Reduced motion ───────────────────────────────────────── */
+/* Keep the identity (glow, color) but drop the infinite pulse/blink loops. */
+@media (prefers-reduced-motion: reduce) {
+  .arc-ring  { animation: none; box-shadow: var(--cyan-glow), inset 0 0 10px #00d4ff22; }
+  .arc-core  { animation: none; box-shadow: 0 0 12px #00d4ff, 0 0 26px #00d4ff88; }
+  .dot.active { animation: none; opacity: 1; }
+  .dot.listening { animation: none; opacity: 1; }
+  .mic-btn.listening { animation: none; box-shadow: 0 0 10px var(--red), 0 0 24px #ff4d0066; }
+  .message { animation: none; }
+  .typing .text::after { animation: none; opacity: 1; }
+  .blink { animation: none; opacity: 1; color: var(--cyan); }
 }
-.email-from    { color: var(--cyan); font-size: 10px; letter-spacing: 1px; text-transform: uppercase; }
-.email-subject { color: var(--text); font-size: 12px; margin: 2px 0; }
-.email-preview { color: #4a6a7a; font-size: 10px; }
+
+/* ══════════════════════════════════════════════════════════
+   MOBILE (iOS / Android) — compact width
+   One screen, no multi-section nav, so the sidebar becomes a
+   drawer instead of a tab bar. Safe-area insets account for the
+   notch / home indicator / gesture bar on a real device.
+═══════════════════════════════════════════════════════════ */
+
+/* Hidden on desktop by default */
+.sidebar-toggle { display: none; }
+.sidebar-backdrop {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  border: none;
+  padding: 0;
+  background: rgba(0, 0, 0, .75);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .25s ease;
+}
+.sidebar-backdrop.open { opacity: 1; pointer-events: auto; }
+
+@media (max-width: 680px) {
+  html, body { font-size: 14px; }
+
+  .app {
+    flex-direction: column;
+    height: 100dvh;
+  }
+
+  /* Sidebar becomes an off-canvas drawer instead of a permanent column */
+  .sidebar {
+    position: fixed;
+    inset: 0 auto 0 0;
+    z-index: 50;
+    width: 82vw;
+    max-width: 320px;
+    transform: translateX(-100%);
+    transition: transform .25s ease;
+    padding-top: calc(22px + env(safe-area-inset-top));
+    padding-bottom: calc(14px + env(safe-area-inset-bottom));
+    padding-left: calc(14px + env(safe-area-inset-left));
+    box-shadow: 4px 0 24px rgba(0, 0, 0, .4);
+  }
+  .sidebar.open { transform: translateX(0); }
+
+  .sidebar-backdrop { display: block; }
+
+  .sidebar-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    flex-shrink: 0;
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--cyan);
+    font-size: 18px;
+    cursor: pointer;
+  }
+
+  .hud {
+    width: 100%;
+    padding: calc(14px + env(safe-area-inset-top)) 16px calc(10px + env(safe-area-inset-bottom));
+  }
+
+  .hud-header { gap: 10px; }
+  .hud-title h1 { font-size: 17px; letter-spacing: 3px; }
+
+  /* Mobile touch targets: 44x44pt default, vs. 28x28pt on desktop */
+  button[type="submit"], .mic-btn {
+    min-height: 44px;
+    padding: 10px 14px;
+  }
+  .sidebar-toggle, .mic-btn, button[type="submit"] { min-width: 44px; }
+
+  /* The smallest secondary type was tuned for a 1-3 ft desktop viewing
+     distance; mobile viewing is closer to 1-2 ft but the text is also
+     physically smaller on screen, so these move up one notch. */
+  .shortcut-row span, kbd, .sidebar-label, .clock-date,
+  .stat-name, .stat-val, .stat-detail, .subtitle,
+  .hud-footer, .message .label {
+    font-size: 12px;
+  }
+
+  .message .text { font-size: 15px; }
+
+  #chat-input { font-size: 16px; } /* iOS Safari/WebKit zooms the page on focus below 16px */
+}

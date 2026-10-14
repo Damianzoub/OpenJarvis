@@ -6,6 +6,8 @@ const messagesEl  = document.querySelector<HTMLDivElement>("#messages")!;
 const formEl      = document.querySelector<HTMLFormElement>("#chat-form")!;
 const inputEl     = document.querySelector<HTMLInputElement>("#chat-input")!;
 const statusEl    = document.querySelector<HTMLSpanElement>("#status-text")!;
+const bannerEl    = document.querySelector<HTMLDivElement>("#connection-banner")!;
+const bannerTextEl = document.querySelector<HTMLSpanElement>("#connection-banner-text")!;
 const micBtn      = document.querySelector<HTMLButtonElement>("#mic-btn")!;
 const micDot      = document.querySelector<HTMLSpanElement>("#mic-dot")!;
 const clockTime   = document.querySelector<HTMLElement>("#clock-time")!;
@@ -15,6 +17,23 @@ const cpuVal      = document.querySelector<HTMLElement>("#cpu-val")!;
 const ramFill     = document.querySelector<HTMLElement>("#ram-fill")!;
 const ramVal      = document.querySelector<HTMLElement>("#ram-val")!;
 const ramDetail   = document.querySelector<HTMLElement>("#ram-detail")!;
+const sidebarEl      = document.querySelector<HTMLElement>("#sidebar-panel")!;
+const sidebarToggle  = document.querySelector<HTMLButtonElement>("#sidebar-toggle")!;
+const sidebarBackdrop = document.querySelector<HTMLButtonElement>("#sidebar-backdrop")!;
+
+// ── Mobile sidebar drawer ────────────────────────────────────
+function closeSidebar() {
+  sidebarEl.classList.remove("open");
+  sidebarBackdrop.classList.remove("open");
+  sidebarToggle.setAttribute("aria-expanded", "false");
+}
+function toggleSidebar() {
+  const open = sidebarEl.classList.toggle("open");
+  sidebarBackdrop.classList.toggle("open", open);
+  sidebarToggle.setAttribute("aria-expanded", String(open));
+}
+sidebarToggle.addEventListener("click", toggleSidebar);
+sidebarBackdrop.addEventListener("click", closeSidebar);
 
 // ── Clock ──────────────────────────────────────────────────
 const DAYS   = ["SUN","MON","TUE","WED","THU","FRI","SAT"];
@@ -40,11 +59,13 @@ async function fetchStats() {
     const cpu = data.cpu as number;
     cpuFill.style.width = `${cpu}%`;
     cpuFill.classList.toggle("high", cpu > 80);
+    cpuVal.classList.toggle("high", cpu > 80);
     cpuVal.textContent  = `${cpu}%`;
 
     const ram = data.ram as number;
     ramFill.style.width = `${ram}%`;
     ramFill.classList.toggle("high", ram > 85);
+    ramVal.classList.toggle("high", ram > 85);
     ramVal.textContent  = `${ram}%`;
     ramDetail.textContent = `${data.ram_used_gb}GB / ${data.ram_total_gb}GB`;
   } catch {
@@ -55,23 +76,46 @@ fetchStats();
 setInterval(fetchStats, 3000);
 
 // ── Keyboard shortcuts ─────────────────────────────────────
+function clearConversation() {
+  messagesEl.innerHTML = "";
+  chatHistory.length = 0;
+}
+
 document.addEventListener("keydown", (e) => {
   if (e.ctrlKey && e.key === "l") {
     e.preventDefault();
-    messagesEl.innerHTML = "";
-    chatHistory.length=0;
+    clearConversation();
   }
   if (e.ctrlKey && e.key === "m") {
     e.preventDefault();
     toggleMic();
+  }
+  if (e.key === "Escape" && sidebarEl.classList.contains("open")) {
+    closeSidebar();
   }
   if (e.key === "Escape" && isListening) {
     stopListening();
   }
 });
 
+// ── Native menu bar (Jarvis > Toggle Mic / Clear Conversation) ──
+(async () => {
+  const { listen } = await import("@tauri-apps/api/event");
+  await listen("menu-toggle-mic", () => toggleMic());
+  await listen("menu-clear-conversation", () => clearConversation());
+})();
+
 // ── Chat helpers ───────────────────────────────────────────
 function setStatus(text: string) { statusEl.textContent = text; }
+
+function setConnectionError(message: string | null) {
+  if (message) {
+    bannerTextEl.textContent = message;
+    bannerEl.hidden = false;
+  } else {
+    bannerEl.hidden = true;
+  }
+}
 
 function renderMarkdown(text: string): string {
   return marked.parse(text) as string;
@@ -112,6 +156,7 @@ async function sendMessage(message: string) {
   const thinking = addMessage("", "jarvis");
   thinking.classList.add("typing");
   setStatus("PROCESSING...");
+  setConnectionError(null);
 
   try {
     const res = await fetch("http://localhost:8000/chat", {
@@ -144,17 +189,6 @@ async function sendMessage(message: string) {
               reply = data.content;
               thinking.classList.remove("typing");
               thinking.querySelector<HTMLDivElement>(".text")!.innerHTML = renderMarkdown(reply);
-            } else if (data.type === "emails") {
-              thinking.classList.remove("typing");
-              const el = thinking.querySelector<HTMLSpanElement>(".text")!;
-              el.innerHTML = data.content.map((e: any) => `
-                <div class="email-card">
-                  <div class="email-from">${e.from}</div>
-                  <div class="email-subject">${e.subject}</div>
-                  <div class="email-preview">${e.snippet}</div>
-                </div>
-              `).join("");
-              chatHistory.push({ role: "assistant", content: "Showed recent emails." });
             } else if (data.type === "done") {
               chatHistory.push({ role: "assistant", content: reply });
               setStatus("SYSTEM ONLINE");
@@ -168,6 +202,7 @@ async function sendMessage(message: string) {
     thinking.querySelector<HTMLSpanElement>(".text")!.textContent =
       "Connection failed. Is the backend running?";
     setStatus("BACKEND OFFLINE");
+    setConnectionError("Can't reach the backend — is it running?");
     chatHistory.pop();
   } finally {
     inputEl.disabled = false;
