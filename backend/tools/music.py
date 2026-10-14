@@ -1,7 +1,7 @@
 import os
 import asyncio
 from playwright.async_api import async_playwright, BrowserContext
-from bu_agent_sdk.tools import tool
+from langchain.tools import tool
 
 _ctx: BrowserContext | None = None
 _pw = None
@@ -28,7 +28,7 @@ async def _page():
     return ctx.pages[0] if ctx.pages else await ctx.new_page()
 
 
-@tool("Play music on YouTube. Accepts a song or artist name to search for.")
+@tool(description="Play music on YouTube, optionally searching for a specific song or artist.")
 async def play_music(query: str = "") -> str:
     print(f"[MUSIC] play_music called: {query!r}")
     try:
@@ -59,7 +59,7 @@ async def play_music(query: str = "") -> str:
         return "Opened YouTube."
 
 
-@tool("Pause or resume music")
+@tool(description="Pause or resume the currently playing music.")
 async def pause_music() -> str:
     try:
         page = await _page()
@@ -69,7 +69,7 @@ async def pause_music() -> str:
         return f"Could not pause: {e}"
 
 
-@tool("Go to the previous track")
+@tool(description="Go back to the previous music track.")
 async def previous_track() -> str:
     try:
         page = await _page()
@@ -79,7 +79,7 @@ async def previous_track() -> str:
         return f"Could not go back: {e}"
 
 
-@tool("Skip to the next track")
+@tool(description="Skip to the next music track.")
 async def next_track() -> str:
     try:
         page = await _page()
@@ -92,7 +92,7 @@ async def next_track() -> str:
         return f"Could not skip: {e}"
 
 
-@tool("Set volume. Level 0-100")
+@tool(description="Set the music playback volume to a level between 0 and 100.")
 async def set_volume(level: int) -> str:
     if level < 0 or level > 100:
         return "Volume level must be between 0 and 100."
@@ -109,7 +109,7 @@ async def set_volume(level: int) -> str:
         return f"Could not set volume: {e}"
 
 
-@tool("Get the current track info")
+@tool(description="Get the title of the currently playing music track.")
 async def current_track_info() -> str:
     try:
         page = await _page()

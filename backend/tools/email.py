@@ -1,18 +1,33 @@
 import base64
+import re
 from email.mime.text import MIMEText
 from googleapiclient.discovery import build
-from bu_agent_sdk.tools import tool 
+from langchain.tools import tool
+from guardrails import Guard,Validator,register_validator
+from guardrails.validator_base import FailResult,PassResult
+from guardrails.errors import ValidationError
 from auth.google_auth import get_credentials
 
-import redis 
-import json 
+import redis
+import json
 
 redis_client = redis.Redis(host='localhost', port=6379, decode_responses=True)
+
+_EMAIL_RE = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
+
+@register_validator(name="valid-email-address", data_type="string")
+class ValidateEmail(Validator):
+    def validate(self, value, metadata):
+        if not _EMAIL_RE.match(value or ""):
+            return FailResult(error_message=f"'{value}' is not a valid email address.")
+        return PassResult()
 
 def _service():
     return build('gmail', 'v1', credentials=get_credentials())
 
-@tool("Read recent emails from the user's Gmail account. Call this when the user asks to check their email.")
+_guard = Guard().use(ValidateEmail())
+
+@tool(description="Read recent emails from the inbox.")
 async def read_emails(max_results: int = 5) -> str:
     cached = redis_client.get("recent_emails")
     if not cached:
@@ -27,8 +42,13 @@ async def read_emails(max_results: int = 5) -> str:
         lines.append("---")
     return "\n".join(lines)
 
-@tool("Create a draft email in the user's Gmail account. Call this when the user asks to compose an email.")
+@tool(description="Create an email draft with a recipient, subject, and body.")
 async def create_draft(to:str, subject:str, body:str)->str:
+    try:
+        _guard.validate(to)
+    except ValidationError as e:
+        return str(e)
+
     service = _service()
     message = MIMEText(body)
     message['to'] = to

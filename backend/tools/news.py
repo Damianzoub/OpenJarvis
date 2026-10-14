@@ -2,7 +2,7 @@ import os
 import httpx 
 from dotenv import load_dotenv
 
-from bu_agent_sdk.tools import tool
+from langchain.tools import tool
 
 load_dotenv()
 
@@ -35,6 +35,6 @@ async def _get_news(category:str='technology',count:int=5,country:str='gr')->str
     return "\n".join(lines)
 
 
-@tool("Get the latest news headlines. Call this when the user asks about news, headlines, or what's happening in the world.")
+@tool(description="Get the latest news headlines for a given category.")
 async def get_news(category: str = "general", count: int = 5) -> str:
     return await _get_news(category, count)

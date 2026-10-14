@@ -1,8 +1,25 @@
 import asyncio
+from datetime import datetime
 from textwrap import dedent
+from guardrails import Guard, Validator, register_validator
+from guardrails.errors import ValidationError
+from guardrails.validator_base import FailResult, PassResult
 
 def escape_applescript(value:str)->str:
     return value.replace("\\", "\\\\").replace('"', '\\"')
+
+
+@register_validator(name="valid-calendar-datetime", data_type="string")
+class ValidCalendarDatetime(Validator):
+    def validate(self, value, metadata):
+        try:
+            datetime.fromisoformat(value.replace("Z", "+00:00"))
+        except (ValueError, AttributeError):
+            return FailResult(error_message=f"'{value}' is not a valid ISO datetime.")
+        return PassResult()
+
+
+_guard = Guard().use(ValidCalendarDatetime())
 
 
 class MacCalendarAdapter:
@@ -13,6 +30,11 @@ class MacCalendarAdapter:
         end_date,
         calendar_name="Home"
     ):
+        title = escape_applescript(title)
+        start_date = escape_applescript(start_date)
+        end_date = escape_applescript(end_date)
+        calendar_name = escape_applescript(calendar_name)
+
         script = dedent(f'''
         tell application "Calendar"
             tell calendar "{calendar_name}"
@@ -77,7 +99,7 @@ class MacCalendarAdapter:
                 })
 
         return events
-    
+
     async def delete_event(self,event_id,calendar_name="Home"):
         calendar_name = escape_applescript(calendar_name)
         event_id = escape_applescript(event_id)
@@ -173,17 +195,13 @@ class GoogleCalendarAdapter:
         }
 
 
-
-
-
-
-from googleapiclient.discovery import build 
-from bu_agent_sdk.tools import tool 
+from googleapiclient.discovery import build
+from langchain.tools import tool
 from auth.google_auth import get_credentials
 from datetime import datetime, timedelta, timezone
 
-import redis 
-import json 
+import redis
+import json
 
 redis_client = redis.Redis(host='localhost', port=6379, decode_responses=True)
 
@@ -207,7 +225,7 @@ async def _create_event(title:str, start:str, end:str):
     event = await cal.create_event(title=title, start=start, end=end)
     return f"Event created: {event.get('htmlLink', 'No link available')}"
 
-@tool("List upcoming calendar events from the user's Google Calendar. Call this when the user asks to list or show their events.")
+@tool(description="List upcoming calendar events for the next N days.")
 async def list_events(days:int=7)->str:
     cached = redis_client.get("today_events")
     if cached:
@@ -216,8 +234,17 @@ async def list_events(days:int=7)->str:
             return "\n".join([f"{e['summary']} at {e['start'].get('dateTime', e['start'].get('date'))}" for e in events])
     return await _list_events(days=days)
 
-@tool("Create a calendar event in the user's Google Calendar. Call this when the user asks to create an event.")
+@tool(description="Create a calendar event with a title, start time, and end time.")
 async def create_event(title:str, start:str, end:str)->str:
+    try:
+        _guard.validate(start)
+        _guard.validate(end)
+    except ValidationError as e:
+        return str(e)
+
+    if datetime.fromisoformat(end.replace("Z", "+00:00")) <= datetime.fromisoformat(start.replace("Z", "+00:00")):
+        return "Invalid event: end time must be after start time."
+
     print(f"[CALENDAR] create_event called: {title!r} {start} -> {end}")
     result = await _create_event(title, start, end)
     redis_client.delete("today_events")
