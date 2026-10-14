@@ -12,59 +12,45 @@
 
     <div class="app">
 
-      <!-- Backdrop — mobile only, closes the sidebar drawer on tap -->
+      <!-- Backdrop — mobile only, closes the nav drawer on tap -->
       <button type="button" id="sidebar-backdrop" class="sidebar-backdrop" aria-hidden="true" tabindex="-1"></button>
 
-      <!-- ── Left sidebar ─────────────────────────────── -->
+      <!-- ── Left sidebar — navigation only ──────────────── -->
       <aside class="sidebar" id="sidebar-panel">
         <span class="corner bl" aria-hidden="true"></span>
 
-        <section class="sidebar-section">
-          <div class="sidebar-label">CLOCK</div>
-          <div class="clock-time" id="clock-time">00:00:00</div>
-          <div class="clock-date" id="clock-date">--- -- ----</div>
-        </section>
+        <div class="nav-brand">
+          <img class="nav-brand-mark" src="/logo-mark.png" alt="" aria-hidden="true" />
+          <span class="nav-brand-text">J.A.R.V.I.S.</span>
+        </div>
 
-        <div class="sidebar-divider"></div>
+        <nav class="nav-list" aria-label="Dashboard sections">
+          <a class="nav-item active" href="#card-system"><span class="nav-icon" aria-hidden="true">◆</span>Dashboard</a>
+          <a class="nav-item" href="#card-conversation"><span class="nav-icon" aria-hidden="true">&gt;_</span>Chat</a>
+          <a class="nav-item" href="#card-calendar"><span class="nav-icon" aria-hidden="true">▤</span>Calendar</a>
+          <a class="nav-item" href="#card-email"><span class="nav-icon" aria-hidden="true">✉</span>Email</a>
+          <a class="nav-item" href="#card-weather"><span class="nav-icon" aria-hidden="true">☁</span>Weather</a>
+          <a class="nav-item" href="#card-news"><span class="nav-icon" aria-hidden="true">≡</span>News</a>
+          <a class="nav-item" href="#card-music"><span class="nav-icon" aria-hidden="true">♫</span>Music</a>
+          <a class="nav-item" href="#card-files"><span class="nav-icon" aria-hidden="true">▣</span>Files</a>
+          <a class="nav-item" href="#card-knowledge"><span class="nav-icon" aria-hidden="true">◈</span>Knowledge</a>
+        </nav>
 
-        <section class="sidebar-section">
-          <div class="sidebar-label">SYSTEM</div>
-          <div class="stat-row">
-            <span class="stat-name">CPU</span>
-            <div class="stat-bar"><div class="stat-fill" id="cpu-fill"></div></div>
-            <span class="stat-val" id="cpu-val">--%</span>
-          </div>
-          <div class="stat-row">
-            <span class="stat-name">RAM</span>
-            <div class="stat-bar"><div class="stat-fill" id="ram-fill"></div></div>
-            <span class="stat-val" id="ram-val">--%</span>
-          </div>
-          <div class="stat-detail" id="ram-detail"></div>
-        </section>
+        <div class="sidebar-spacer"></div>
 
-        <div class="sidebar-divider"></div>
-
-        <section class="sidebar-section">
-          <div class="sidebar-label">SHORTCUTS</div>
-          <div class="shortcut-row"><kbd>ENTER</kbd><span>Send</span></div>
-          <div class="shortcut-row"><kbd>CTRL+M</kbd><span>Mic</span></div>
-          <div class="shortcut-row"><kbd>CTRL+L</kbd><span>Clear</span></div>
-          <div class="shortcut-row"><kbd>ESC</kbd><span>Cancel</span></div>
-        </section>
+        <div class="nav-footer">DAMIANOS INDUSTRIES</div>
       </aside>
 
-      <!-- ── Main HUD ───────────────────────────────── -->
+      <!-- ── Main dashboard ─────────────────────────────── -->
       <main class="hud">
         <span class="corner br" aria-hidden="true"></span>
 
-        <header class="hud-header">
-          <button type="button" id="sidebar-toggle" class="sidebar-toggle" aria-label="System info" aria-expanded="false" aria-controls="sidebar-panel">☰</button>
-          <div class="arc-ring" aria-hidden="true">
-            <div class="arc-core"></div>
-          </div>
-          <div class="hud-title">
-            <h1>J.A.R.V.I.S.</h1>
-            <p class="subtitle">Just A Rather Very Intelligent System</p>
+        <!-- Top bar -->
+        <header class="topbar">
+          <button type="button" id="sidebar-toggle" class="sidebar-toggle" aria-label="Navigation" aria-expanded="false" aria-controls="sidebar-panel">☰</button>
+          <div class="topbar-clock">
+            <span class="clock-time" id="clock-time">00:00:00</span>
+            <span class="clock-date" id="clock-date">--- -- ----</span>
           </div>
           <div class="status-dots" aria-hidden="true">
             <span class="dot active"></span>
@@ -73,16 +59,103 @@
           </div>
         </header>
 
-        <div class="divider"></div>
-
-        <div id="messages" class="messages" aria-live="polite">
-          <div class="message jarvis">
-            <span class="label">JARVIS</span>
-            <span class="text">Online and ready, sir. How can I assist you?</span>
+        <!-- Hero -->
+        <section class="hero">
+          <img class="brand-mark-hero" src="/logo-mark.png" alt="" aria-hidden="true" />
+          <div class="hero-title">
+            <h1>J.A.R.V.I.S.</h1>
+            <p class="subtitle">Just A Rather Very Intelligent System</p>
           </div>
-        </div>
+        </section>
 
         <div class="divider"></div>
+
+        <!-- Dashboard grid -->
+        <div class="dashboard-grid">
+
+          <article class="card card-wide" id="card-system">
+            <h2 class="card-title">System</h2>
+            <div class="stat-row">
+              <span class="stat-name">CPU</span>
+              <div class="stat-bar"><div class="stat-fill" id="cpu-fill"></div></div>
+              <span class="stat-val" id="cpu-val">--%</span>
+            </div>
+            <div class="stat-row">
+              <span class="stat-name">RAM</span>
+              <div class="stat-bar"><div class="stat-fill" id="ram-fill"></div></div>
+              <span class="stat-val" id="ram-val">--%</span>
+            </div>
+            <div class="stat-detail" id="ram-detail"></div>
+          </article>
+
+          <article class="card" id="card-calendar" data-agent="Calendar">
+            <h2 class="card-title"><span class="card-icon" aria-hidden="true">▤</span>Calendar<span class="card-badge"></span></h2>
+            <p class="card-empty">Ask Jarvis what's on your schedule.</p>
+            <button type="button" class="card-action" data-prompt="What's on my calendar today?">Check today</button>
+          </article>
+
+          <article class="card" id="card-email" data-agent="Email">
+            <h2 class="card-title"><span class="card-icon" aria-hidden="true">✉</span>Email<span class="card-badge"></span></h2>
+            <p class="card-empty">Ask Jarvis to check your inbox.</p>
+            <button type="button" class="card-action" data-prompt="Check my inbox for anything important.">Check inbox</button>
+          </article>
+
+          <article class="card" id="card-weather" data-agent="Weather">
+            <h2 class="card-title"><span class="card-icon" aria-hidden="true">☁</span>Weather<span class="card-badge"></span></h2>
+            <p class="card-empty">Ask Jarvis for the current forecast.</p>
+            <button type="button" class="card-action" data-prompt="What's the weather like right now?">Check weather</button>
+          </article>
+
+          <article class="card" id="card-news" data-agent="News">
+            <h2 class="card-title"><span class="card-icon" aria-hidden="true">≡</span>News<span class="card-badge"></span></h2>
+            <p class="card-empty">Ask Jarvis for today's headlines.</p>
+            <button type="button" class="card-action" data-prompt="Give me today's top headlines.">Get headlines</button>
+          </article>
+
+          <article class="card" id="card-music" data-agent="Music">
+            <h2 class="card-title"><span class="card-icon" aria-hidden="true">♫</span>Music<span class="card-badge"></span></h2>
+            <p class="card-empty">Ask Jarvis what's playing.</p>
+            <button type="button" class="card-action" data-prompt="What's currently playing?">Check player</button>
+          </article>
+
+          <article class="card" id="card-files" data-agent="Filesystem">
+            <h2 class="card-title"><span class="card-icon" aria-hidden="true">▣</span>Files<span class="card-badge"></span></h2>
+            <p class="card-empty">Ask Jarvis to search your files.</p>
+            <button type="button" class="card-action" data-prompt="Search my Documents for recently modified files.">Search files</button>
+          </article>
+
+          <article class="card" id="card-knowledge" data-agent="Knowledge">
+            <h2 class="card-title"><span class="card-icon" aria-hidden="true">◈</span>Knowledge<span class="card-badge"></span></h2>
+            <p class="card-empty">Ask Jarvis to search your notes.</p>
+            <button type="button" class="card-action" data-prompt="Search my notes for anything relevant to what we've been discussing.">Search notes</button>
+          </article>
+
+          <article class="card" id="card-shortcuts">
+            <h2 class="card-title">Shortcuts</h2>
+            <div class="shortcut-row"><kbd>ENTER</kbd><span>Send</span></div>
+            <div class="shortcut-row"><kbd>CTRL+M</kbd><span>Mic</span></div>
+            <div class="shortcut-row"><kbd>CTRL+L</kbd><span>Clear</span></div>
+            <div class="shortcut-row"><kbd>ESC</kbd><span>Cancel</span></div>
+          </article>
+
+          <article class="card card-wide" id="card-activity">
+            <h2 class="card-title">Recent Activity</h2>
+            <ul class="activity-list" id="activity-list">
+              <li class="activity-empty">No activity yet.</li>
+            </ul>
+          </article>
+
+          <article class="card card-wide card-conversation" id="card-conversation">
+            <h2 class="card-title"><span class="card-icon" aria-hidden="true">&gt;_</span>Conversation</h2>
+            <div id="messages" class="messages" aria-live="polite">
+              <div class="message jarvis">
+                <span class="label">JARVIS</span>
+                <span class="text">Online and ready, sir. How can I assist you?</span>
+              </div>
+            </div>
+          </article>
+
+        </div>
 
         <div id="connection-banner" class="connection-banner" role="alert" hidden>
           <span class="connection-banner-text" id="connection-banner-text"></span>
@@ -90,6 +163,7 @@
 
         <form id="chat-form" class="input-row">
           <span class="prompt-symbol">&gt;_</span>
+          <button type="button" id="import-btn" class="import-btn" title="Import a file for Jarvis to check">+</button>
           <input id="chat-input" placeholder="Enter command..." autocomplete="off" spellcheck="false" />
           <button type="button" id="mic-btn" class="mic-btn" title="Ctrl+M">MIC</button>
           <button type="submit">SEND</button>
@@ -100,6 +174,15 @@
           <span class="footer-item blink" id="status-text" role="status" aria-live="polite">SYSTEM ONLINE</span>
           <span class="footer-item">v0.0.0</span>
         </div>
+
+        <!-- Bottom tab bar — mobile only, the top sections people use most -->
+        <nav class="tab-bar" id="tab-bar" aria-label="Primary">
+          <a class="tab-item active" href="#card-system" data-tab><span class="tab-icon" aria-hidden="true">◆</span><span class="tab-label">Dashboard</span></a>
+          <a class="tab-item" href="#card-conversation" data-tab><span class="tab-icon" aria-hidden="true">&gt;_</span><span class="tab-label">Chat</span></a>
+          <a class="tab-item" href="#card-calendar" data-tab><span class="tab-icon" aria-hidden="true">▤</span><span class="tab-label">Calendar</span></a>
+          <a class="tab-item" href="#card-files" data-tab><span class="tab-icon" aria-hidden="true">▣</span><span class="tab-label">Files</span></a>
+          <button type="button" class="tab-item" id="tab-more" aria-haspopup="true" aria-expanded="false" aria-controls="sidebar-panel"><span class="tab-icon" aria-hidden="true">⋯</span><span class="tab-label">More</span></button>
+        </nav>
       </main>
 
     </div>

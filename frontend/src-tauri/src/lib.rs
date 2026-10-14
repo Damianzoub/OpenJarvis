@@ -2,6 +2,11 @@
 use tauri::menu::{Menu, MenuItemBuilder, SubmenuBuilder};
 use tauri::Emitter;
 
+#[cfg(desktop)]
+use tauri::Manager;
+#[cfg(desktop)]
+use tauri_plugin_global_shortcut::ShortcutState;
+
 #[tauri::command]
 fn greet(name: &str) -> String {
     format!("Hello, {}! You've been greeted from Rust!", name)
@@ -9,8 +14,36 @@ fn greet(name: &str) -> String {
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
-    tauri::Builder::default()
+    let mut builder = tauri::Builder::default()
         .plugin(tauri_plugin_opener::init())
+        .plugin(tauri_plugin_dialog::init());
+
+    // Global hotkey to summon/dismiss the HUD from anywhere — desktop only,
+    // the plugin doesn't support iOS/Android.
+    #[cfg(desktop)]
+    {
+        builder = builder.plugin(
+            tauri_plugin_global_shortcut::Builder::new()
+                .with_shortcut("CmdOrCtrl+Shift+J")
+                .expect("invalid global shortcut accelerator")
+                .with_handler(|app, _shortcut, event| {
+                    if event.state() == ShortcutState::Pressed {
+                        if let Some(window) = app.get_webview_window("main") {
+                            let visible = window.is_visible().unwrap_or(false);
+                            if visible {
+                                let _ = window.hide();
+                            } else {
+                                let _ = window.show();
+                                let _ = window.set_focus();
+                            }
+                        }
+                    }
+                })
+                .build(),
+        );
+    }
+
+    builder
         .invoke_handler(tauri::generate_handler![greet])
         .menu(|app| {
             let menu = Menu::default(app)?;

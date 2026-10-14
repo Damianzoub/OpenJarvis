@@ -9,6 +9,7 @@ const statusEl    = document.querySelector<HTMLSpanElement>("#status-text")!;
 const bannerEl    = document.querySelector<HTMLDivElement>("#connection-banner")!;
 const bannerTextEl = document.querySelector<HTMLSpanElement>("#connection-banner-text")!;
 const micBtn      = document.querySelector<HTMLButtonElement>("#mic-btn")!;
+const importBtn   = document.querySelector<HTMLButtonElement>("#import-btn")!;
 const micDot      = document.querySelector<HTMLSpanElement>("#mic-dot")!;
 const clockTime   = document.querySelector<HTMLElement>("#clock-time")!;
 const clockDate   = document.querySelector<HTMLElement>("#clock-date")!;
@@ -20,20 +21,44 @@ const ramDetail   = document.querySelector<HTMLElement>("#ram-detail")!;
 const sidebarEl      = document.querySelector<HTMLElement>("#sidebar-panel")!;
 const sidebarToggle  = document.querySelector<HTMLButtonElement>("#sidebar-toggle")!;
 const sidebarBackdrop = document.querySelector<HTMLButtonElement>("#sidebar-backdrop")!;
+const tabMore        = document.querySelector<HTMLButtonElement>("#tab-more")!;
 
 // ── Mobile sidebar drawer ────────────────────────────────────
+// Both the topbar hamburger and the tab bar's "More" item open the same
+// drawer, so both need their aria-expanded state kept in sync.
+const drawerTriggers = [sidebarToggle, tabMore];
+
 function closeSidebar() {
   sidebarEl.classList.remove("open");
   sidebarBackdrop.classList.remove("open");
-  sidebarToggle.setAttribute("aria-expanded", "false");
+  drawerTriggers.forEach((el) => el.setAttribute("aria-expanded", "false"));
 }
 function toggleSidebar() {
   const open = sidebarEl.classList.toggle("open");
   sidebarBackdrop.classList.toggle("open", open);
-  sidebarToggle.setAttribute("aria-expanded", String(open));
+  drawerTriggers.forEach((el) => el.setAttribute("aria-expanded", String(open)));
 }
 sidebarToggle.addEventListener("click", toggleSidebar);
+tabMore.addEventListener("click", toggleSidebar);
 sidebarBackdrop.addEventListener("click", closeSidebar);
+
+// Nav links close the mobile drawer after jumping to a dashboard card
+document.querySelectorAll<HTMLAnchorElement>(".nav-item").forEach((link) => {
+  link.addEventListener("click", () => {
+    document.querySelectorAll<HTMLAnchorElement>(".nav-item").forEach((el) => el.classList.remove("active"));
+    link.classList.add("active");
+    if (sidebarEl.classList.contains("open")) closeSidebar();
+  });
+});
+
+// Bottom tab bar — direct links set the active tab; they target the same
+// anchors as the drawer's nav list, so they track their own active state.
+document.querySelectorAll<HTMLAnchorElement>(".tab-item[data-tab]").forEach((tab) => {
+  tab.addEventListener("click", () => {
+    document.querySelectorAll<HTMLAnchorElement>(".tab-item[data-tab]").forEach((el) => el.classList.remove("active"));
+    tab.classList.add("active");
+  });
+});
 
 // ── Clock ──────────────────────────────────────────────────
 const DAYS   = ["SUN","MON","TUE","WED","THU","FRI","SAT"];
@@ -74,6 +99,102 @@ async function fetchStats() {
 }
 fetchStats();
 setInterval(fetchStats, 3000);
+
+// ── Live dashboard cards + activity feed ─────────────────────
+const ACTIVITY_KEY = "jarvis_activity_log";
+const MAX_ACTIVITY = 30;
+
+type ActivityEntry = { agent: string; summary: string; timestamp: number };
+
+function loadActivity(): ActivityEntry[] {
+  try {
+    const raw = localStorage.getItem(ACTIVITY_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch {
+    return [];
+  }
+}
+
+function saveActivity(entries: ActivityEntry[]) {
+  try {
+    localStorage.setItem(ACTIVITY_KEY, JSON.stringify(entries.slice(0, MAX_ACTIVITY)));
+  } catch {
+    // storage unavailable (private browsing, quota, etc.) — skip silently
+  }
+}
+
+function escapeHtml(text: string): string {
+  const div = document.createElement("div");
+  div.textContent = text;
+  return div.innerHTML;
+}
+
+function summarize(text: string): string {
+  const plain = text.replace(/[#*`_>]/g, "").replace(/\s+/g, " ").trim();
+  return plain.length > 140 ? plain.slice(0, 140) + "…" : plain;
+}
+
+function timeAgo(timestamp: number): string {
+  const mins = Math.floor((Date.now() - timestamp) / 60000);
+  if (mins < 1) return "just now";
+  if (mins < 60) return `${mins}m ago`;
+  const hours = Math.floor(mins / 60);
+  if (hours < 24) return `${hours}h ago`;
+  return `${Math.floor(hours / 24)}d ago`;
+}
+
+function applyEntryToCard(entry: ActivityEntry) {
+  const card = document.querySelector<HTMLElement>(`.card[data-agent="${entry.agent}"]`);
+  if (!card) return;
+  const empty = card.querySelector<HTMLElement>(".card-empty");
+  const badge = card.querySelector<HTMLElement>(".card-badge");
+  if (empty) {
+    empty.textContent = entry.summary;
+    empty.classList.add("has-data");
+  }
+  if (badge) badge.textContent = timeAgo(entry.timestamp);
+}
+
+function renderActivity() {
+  const list = document.querySelector<HTMLUListElement>("#activity-list")!;
+  const entries = loadActivity();
+  if (entries.length === 0) {
+    list.innerHTML = `<li class="activity-empty">No activity yet.</li>`;
+    return;
+  }
+  list.innerHTML = entries
+    .slice(0, 8)
+    .map((e) => `
+      <li class="activity-row">
+        <span class="activity-agent">${escapeHtml(e.agent)}</span>
+        <span class="activity-summary">${escapeHtml(e.summary)}</span>
+        <span class="activity-time">${timeAgo(e.timestamp)}</span>
+      </li>`)
+    .join("");
+}
+
+function recordActivity(agent: string, summary: string) {
+  if (!summary) return;
+  const entry: ActivityEntry = { agent, summary: summarize(summary), timestamp: Date.now() };
+  const entries = loadActivity();
+  entries.unshift(entry);
+  saveActivity(entries);
+  applyEntryToCard(entry);
+  renderActivity();
+}
+
+function hydrateDashboard() {
+  const entries = loadActivity();
+  const seen = new Set<string>();
+  for (const entry of entries) {
+    if (seen.has(entry.agent)) continue;
+    seen.add(entry.agent);
+    applyEntryToCard(entry);
+  }
+  renderActivity();
+}
+hydrateDashboard();
+setInterval(renderActivity, 60000); // keep "Xm ago" labels fresh
 
 // ── Keyboard shortcuts ─────────────────────────────────────
 function clearConversation() {
@@ -169,6 +290,7 @@ async function sendMessage(message: string) {
     const decoder = new TextDecoder();
     let buffer = "";
     let reply = "";
+    let agentTag = "General";
 
     while (true) {
       const { done, value } = await reader.read();
@@ -185,13 +307,17 @@ async function sendMessage(message: string) {
               setStatus(data.content.toUpperCase());
             } else if (data.type === "tool") {
               thinking.querySelector<HTMLSpanElement>(".text")!.textContent = data.content;
+              if (data.agent) agentTag = data.agent;
             } else if (data.type === "text") {
               reply = data.content;
+              if (data.agent) agentTag = data.agent;
               thinking.classList.remove("typing");
               thinking.querySelector<HTMLDivElement>(".text")!.innerHTML = renderMarkdown(reply);
             } else if (data.type === "done") {
+              if (data.agent) agentTag = data.agent;
               chatHistory.push({ role: "assistant", content: reply });
               setStatus("SYSTEM ONLINE");
+              recordActivity(agentTag, reply);
             }
           } catch { /* skip malformed chunk */ }
         }
@@ -215,6 +341,29 @@ formEl.addEventListener("submit", async (e) => {
   e.preventDefault();
   const message = inputEl.value.trim();
   if (message) await sendMessage(message);
+});
+
+// ── Import a file for Jarvis to check ───────────────────────
+importBtn.addEventListener("click", async () => {
+  try {
+    const { open } = await import("@tauri-apps/plugin-dialog");
+    const selected = await open({ multiple: false, directory: false });
+    if (!selected || typeof selected !== "string") return;
+    document.querySelector("#card-conversation")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    await sendMessage(`Please check this file: ${selected}`);
+  } catch {
+    setStatus("IMPORT UNAVAILABLE");
+  }
+});
+
+// ── Dashboard quick actions ─────────────────────────────────
+document.querySelectorAll<HTMLButtonElement>(".card-action[data-prompt]").forEach((btn) => {
+  btn.addEventListener("click", async () => {
+    const prompt = btn.dataset.prompt;
+    if (!prompt) return;
+    document.querySelector("#card-conversation")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    await sendMessage(prompt);
+  });
 });
 
 // ── Voice input ────────────────────────────────────────────
