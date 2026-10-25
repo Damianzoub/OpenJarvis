@@ -15,18 +15,21 @@ API_Key = os.getenv("OPENAI_API_KEY")
 def configure_llamaIndex():
     if ENV == "Prod":
         Settings.llm = OpenAI(
-            model="gpt-5.6-luna",
+            model="gpt-6-luna",
             api_key=API_Key,
             temperature=0.1,
             max_retries=2,
             callback_manager=CallbackManager()
         )
 
+        # dimensions=512 is a placeholder pending evals/evaluators/embedding_dimension_eval.py —
+        # it compares faithfulness/relevance across candidate dimensions on real data
+        # instead of guessing. Update once that's actually run.
         Settings.embed_model = OpenAIEmbedding(
             model="text-embedding-3-small",
             embed_batch_size=233,
             api_key=API_Key,
-            dimensions=3,
+            dimensions=512,
             callback_manager=CallbackManager(),
             timeout=60.0
         )

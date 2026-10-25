@@ -3,16 +3,25 @@ from llama_index.vector_stores.qdrant import QdrantVectorStore
 from llama_index.core import VectorStoreIndex,StorageContext
 from pathlib import Path
 from llama_index.core.storage.docstore import SimpleDocumentStore
+import os
+
 STORAGE_LOC = Path(__file__).parent
 
-def persist_dir():
-    return str(STORAGE_LOC/"my_información")
+def _env_suffix():
+    return "prod" if os.getenv("ENV") == "Prod" else "dev"
 
-def build_index(nodes,docstore:SimpleDocumentStore,collection_name:str="my_information"):
+def collection_name():
+    return f"my_information_{_env_suffix()}"
+
+def persist_dir():
+    return str(STORAGE_LOC / f"my_information_{_env_suffix()}")
+
+def build_index(nodes,docstore:SimpleDocumentStore,name:str|None=None):
+    name = name or collection_name()
     vector_client = start_db()
-    if vector_client.collection_exists(collection_name=collection_name):
-        vector_client.delete_collection(collection_name=collection_name)
-    qdrant_client = QdrantVectorStore(client=vector_client,collection_name="my_information")
+    if vector_client.collection_exists(collection_name=name):
+        vector_client.delete_collection(collection_name=name)
+    qdrant_client = QdrantVectorStore(client=vector_client,collection_name=name)
     storage_content = StorageContext.from_defaults(vector_store=qdrant_client,docstore=docstore)
 
     index = VectorStoreIndex(

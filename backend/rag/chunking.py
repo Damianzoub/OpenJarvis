@@ -25,7 +25,7 @@ def chunk_document(document,docstore:SimpleDocumentStore):
                 for child in child_section:
                     nodes_index.append(IndexNode.from_text_node(node=child,index_id=parent.node_id))
     else:
-        nodes_parser = HierarchicalNodeParser(chunk_sizes=[1024,256])
+        nodes_parser = HierarchicalNodeParser.from_defaults(chunk_sizes=[1024,256])
         nodes_index = nodes_parser.get_nodes_from_documents([document])
         docstore.add_documents(nodes_index)
 

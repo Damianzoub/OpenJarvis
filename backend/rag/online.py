@@ -8,7 +8,7 @@ from llama_index.core import Settings
 from .config import configure_llamaIndex
 from functools import lru_cache
 from vectorDB.vectorDB_init import start_db
-from .vector_store import persist_dir
+from .vector_store import persist_dir, collection_name
 from llama_index.core.storage.storage_context import StorageContext
 from llama_index.core import load_index_from_storage
 from llama_index.core.response_synthesizers import get_response_synthesizer
@@ -16,7 +16,7 @@ from llama_index.core.response_synthesizers import get_response_synthesizer
 @lru_cache()
 def load_index():
     configure_llamaIndex()
-    vectorStore = QdrantVectorStore(client=start_db(),collection_name="my_información")
+    vectorStore = QdrantVectorStore(client=start_db(),collection_name=collection_name())
     storage_context = StorageContext.from_defaults(persist_dir=persist_dir(),vector_store=vectorStore)
     return load_index_from_storage(storage_context=storage_context)
 
