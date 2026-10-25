@@ -200,6 +200,8 @@ from langchain.tools import tool
 from auth.google_auth import get_credentials
 from datetime import datetime, timedelta, timezone
 
+from observability.logger import logger, DANGER
+
 import redis
 import json
 
@@ -225,6 +227,11 @@ async def _create_event(title:str, start:str, end:str):
     event = await cal.create_event(title=title, start=start, end=end)
     return f"Event created: {event.get('htmlLink', 'No link available')}"
 
+
+async def _delete_event(event_id: str):
+    cal = _google_cal()
+    return await cal.delete_event(event_id)
+
 @tool(description="List upcoming calendar events for the next N days.")
 async def list_events(days:int=7)->str:
     cached = redis_client.get("today_events")
@@ -249,3 +256,14 @@ async def create_event(title:str, start:str, end:str)->str:
     result = await _create_event(title, start, end)
     redis_client.delete("today_events")
     return result
+
+
+@tool(description="Delete a calendar event by its id. Destructive — always ask the user to confirm before calling this with confirm=True; call it once with confirm=False first to preview.")
+async def delete_event(event_id: str, confirm: bool = False) -> str:
+    if not confirm:
+        return f"This will permanently delete event {event_id}. Call delete_event again with confirm=True to proceed."
+
+    logger.log(DANGER, f"calendar event deleted: {event_id}")
+    await _delete_event(event_id)
+    redis_client.delete("today_events")
+    return f"Event {event_id} deleted."
