@@ -1,23 +1,28 @@
 from langgraph.graph import MessagesState
-from langchain_ollama import ChatOllama
 from langchain.agents import create_agent
+from langchain_openai import ChatOpenAI
+from langchain_ollama import ChatOllama
 
 from prompts.router_prompt import _ROUTER_PROMPT
 from prompts.langfuse_client import get_prompt
 
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
+GENERAL_PROMPT = "You are Jarvis, an AI desktop assistant. Answer the user's question helpfully and concisely. YOUR GOAL IS TO ANSWER SIMPLE FAQs and trivial questions"
+
 def _make_llm():
-    return ChatOllama(
-        model="qwen2.5:7b",
-        base_url="http://localhost:11434",
-        temperature=0.1
-    )
+    if os.getenv("ENV") == "Prod":
+        api_key = os.getenv("OPENAI_API_KEY") or None
+        if api_key is None:
+            raise ValueError("We don't have an API KEY")
+        return ChatOpenAI(model="gpt-6-luna",api_key=api_key,temperature=0.1)
+    return ChatOllama(model="qwen2.5:7b",temperature=0.1)
 
 def make_general_agent():
-    return create_agent(
-        _make_llm(),
-        tools=[],
-        system_prompt="You are Jarvis, an AI desktop assistant. Answer the user's question helpfully and concisely. YOUR GOAL IS TO ANSWER SIMPLE FAQs and trivial questions"
-    )
+    return create_agent(model=_make_llm(),tools=[],system_prompt=GENERAL_PROMPT)
 
 
 async def _classify(user_message: str) -> str:

@@ -1,17 +1,22 @@
 from langchain.agents import create_agent
+from langchain_openai import ChatOpenAI
 from langchain_ollama import ChatOllama
 
-from tools.growth import log_goal, log_progress, list_goals
-from prompts.growth_prompt import GROWTH_PROMPT
 from prompts.langfuse_client import get_prompt
+from prompts.growth_prompt import GROWTH_PROMPT
+from tools.growth import log_goal, log_progress, list_goals
+
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 def make_growth_agent():
-    return create_agent(
-        ChatOllama(
-            model="qwen2.5:7b",
-            base_url="http://localhost:11434",
-            temperature=0.1
-        ),
-        tools=[log_goal, log_progress, list_goals],
-        system_prompt=get_prompt(name="growth_prompt") or GROWTH_PROMPT,
-    )
+    if os.getenv("ENV") == "Prod":
+        api_key = os.getenv("OPENAI_API_KEY") or None
+        if api_key is None:
+            raise ValueError("We don't have an API KEY")
+        llm = ChatOpenAI(model="gpt-6-luna",api_key=api_key,temperature=0.1)
+    else:
+        llm = ChatOllama(model="qwen2.5:7b",temperature=0.1)
+    return create_agent(model=llm,tools=[log_goal, log_progress, list_goals],system_prompt=get_prompt(name="growth_prompt") or GROWTH_PROMPT)
