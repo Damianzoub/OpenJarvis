@@ -16,7 +16,8 @@ fn greet(name: &str) -> String {
 pub fn run() {
     let mut builder = tauri::Builder::default()
         .plugin(tauri_plugin_opener::init())
-        .plugin(tauri_plugin_dialog::init());
+        .plugin(tauri_plugin_dialog::init())
+        .plugin(tauri_plugin_notification::init());
 
     // Global hotkey to summon/dismiss the HUD from anywhere — desktop only,
     // the plugin doesn't support iOS/Android.

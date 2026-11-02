@@ -127,6 +127,40 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
   font-size: 11px;
 }
 
+/* Test call — sits above the footer. .in-call is the live state, for when it's wired up. */
+.call-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  min-height: 36px;
+  margin-bottom: 12px;
+  padding: 9px 10px;
+  background: transparent;
+  border: 1px solid var(--cyan);
+  color: var(--cyan);
+  font-family: var(--font);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  cursor: pointer;
+  transition: background .15s, box-shadow .15s, color .15s, border-color .15s;
+}
+.call-btn:hover { background: var(--cyan-dim); box-shadow: var(--cyan-glow); }
+.call-btn:active { background: #5b9dff15; }
+.call-btn:focus-visible { outline: 2px solid var(--cyan); outline-offset: 2px; }
+.call-icon { font-size: 13px; line-height: 1; }
+
+.call-btn.in-call {
+  border-color: var(--red);
+  color: var(--red);
+  box-shadow: 0 0 8px var(--red), 0 0 20px #ff4d0055;
+  animation: mic-pulse .8s ease-in-out infinite alternate;
+}
+.call-btn.in-call:hover { background: #ff4d0015; }
+.call-btn.in-call:focus-visible { outline-color: var(--red); }
+
 .nav-footer {
   font-size: 10px;
   letter-spacing: 2px;
@@ -634,7 +668,8 @@ button[type="submit"]:active { background: #3f7fe0; }
   .brand-mark-hero { animation: none; filter: drop-shadow(0 0 10px #5b9dffaa) drop-shadow(0 0 24px #5b9dff66); }
   .dot.active { animation: none; opacity: 1; }
   .dot.listening { animation: none; opacity: 1; }
-  .mic-btn.listening { animation: none; box-shadow: 0 0 10px var(--red), 0 0 24px #ff4d0066; }
+  .mic-btn.listening,
+  .call-btn.in-call { animation: none; box-shadow: 0 0 10px var(--red), 0 0 24px #ff4d0066; }
   .message { animation: none; }
   .typing .text::after { animation: none; opacity: 1; }
   .blink { animation: none; opacity: 1; color: var(--cyan); }

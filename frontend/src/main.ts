@@ -100,6 +100,38 @@ async function fetchStats() {
 fetchStats();
 setInterval(fetchStats, 3000);
 
+// ── Due reminders — proactive native notifications ──────────
+let notifyPermissionGranted = false;
+
+async function ensureNotifyPermission() {
+  try {
+    const { isPermissionGranted, requestPermission } = await import("@tauri-apps/plugin-notification");
+    notifyPermissionGranted = await isPermissionGranted();
+    if (!notifyPermissionGranted) {
+      const permission = await requestPermission();
+      notifyPermissionGranted = permission === "granted";
+    }
+  } catch {
+    // not running inside Tauri (e.g. plain browser dev mode) — skip silently
+  }
+}
+ensureNotifyPermission();
+
+async function pollDueReminders() {
+  try {
+    const res = await fetch("http://localhost:8000/reminders/due");
+    const due = await res.json() as { text: string }[];
+    if (due.length === 0 || !notifyPermissionGranted) return;
+    const { sendNotification } = await import("@tauri-apps/plugin-notification");
+    for (const reminder of due) {
+      sendNotification({ title: "Reminder", body: reminder.text });
+    }
+  } catch {
+    // backend offline — skip silently, same as fetchStats
+  }
+}
+setInterval(pollDueReminders, 30000);
+
 // ── Live dashboard cards + activity feed ─────────────────────
 const ACTIVITY_KEY = "jarvis_activity_log";
 const MAX_ACTIVITY = 30;

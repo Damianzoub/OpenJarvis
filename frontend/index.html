@@ -34,9 +34,18 @@
           <a class="nav-item" href="#card-music"><span class="nav-icon" aria-hidden="true">♫</span>Music</a>
           <a class="nav-item" href="#card-files"><span class="nav-icon" aria-hidden="true">▣</span>Files</a>
           <a class="nav-item" href="#card-knowledge"><span class="nav-icon" aria-hidden="true">◈</span>Knowledge</a>
+          <a class="nav-item" href="#card-reminders"><span class="nav-icon" aria-hidden="true">◷</span>Reminders</a>
+          <a class="nav-item" href="#card-growth"><span class="nav-icon" aria-hidden="true">↑</span>Growth</a>
+          <a class="nav-item" href="#card-finance"><span class="nav-icon" aria-hidden="true">¤</span>Finance</a>
         </nav>
 
         <div class="sidebar-spacer"></div>
+
+        <!-- Test call — styling only; wired to /ws/voice once the backend is ready -->
+        <button type="button" class="call-btn" id="test-call-btn" aria-pressed="false">
+          <span class="call-icon" aria-hidden="true">☎</span>
+          <span class="call-label">TEST CALL</span>
+        </button>
 
         <div class="nav-footer">DAMIANOS INDUSTRIES</div>
       </aside>
@@ -128,6 +137,24 @@
             <h2 class="card-title"><span class="card-icon" aria-hidden="true">◈</span>Knowledge<span class="card-badge"></span></h2>
             <p class="card-empty">Ask Jarvis to search your notes.</p>
             <button type="button" class="card-action" data-prompt="Search my notes for anything relevant to what we've been discussing.">Search notes</button>
+          </article>
+
+          <article class="card" id="card-reminders" data-agent="Reminders">
+            <h2 class="card-title"><span class="card-icon" aria-hidden="true">◷</span>Reminders<span class="card-badge"></span></h2>
+            <p class="card-empty">Ask Jarvis what's due.</p>
+            <button type="button" class="card-action" data-prompt="What are my reminders?">Check reminders</button>
+          </article>
+
+          <article class="card" id="card-growth" data-agent="Growth">
+            <h2 class="card-title"><span class="card-icon" aria-hidden="true">↑</span>Growth<span class="card-badge"></span></h2>
+            <p class="card-empty">Ask Jarvis about your goals.</p>
+            <button type="button" class="card-action" data-prompt="What goals am I working on?">Check goals</button>
+          </article>
+
+          <article class="card" id="card-finance" data-agent="Finance">
+            <h2 class="card-title"><span class="card-icon" aria-hidden="true">¤</span>Finance<span class="card-badge"></span></h2>
+            <p class="card-empty">Ask Jarvis about your budget.</p>
+            <button type="button" class="card-action" data-prompt="How much have I spent this month?">Check budget</button>
           </article>
 
           <article class="card" id="card-shortcuts">
