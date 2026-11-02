@@ -18,7 +18,7 @@ def _make_llm():
         api_key = os.getenv("OPENAI_API_KEY") or None
         if api_key is None:
             raise ValueError("We don't have an API KEY")
-        return ChatOpenAI(model="gpt-6-luna",api_key=api_key,temperature=0.1)
+        return ChatOpenAI(model="gpt-6-luna",api_key=api_key,reasoning_effort="none")
     return ChatOllama(model="qwen2.5:7b",temperature=0.1)
 
 def make_general_agent():

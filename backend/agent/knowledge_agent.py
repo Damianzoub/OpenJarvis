@@ -16,7 +16,7 @@ def make_knowledge_agent():
         api_key = os.getenv("OPENAI_API_KEY") or None
         if api_key is None:
             raise ValueError("We don't have an API KEY")
-        llm = ChatOpenAI(model="gpt-6-luna",api_key=api_key,temperature=0.1)
+        llm = ChatOpenAI(model="gpt-6-luna",api_key=api_key,reasoning_effort="none")
     else:
         llm = ChatOllama(model="mistral:latest",temperature=0.1)
     return create_agent(model=llm,tools=[search_knowledge, ingest_document],system_prompt=get_prompt(name="rag_prompt") or RAG_PROMPT)
