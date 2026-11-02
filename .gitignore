@@ -167,15 +167,22 @@ venv.bak/
 
 # Rope project settings
 .ropeproject
-
+Dockerfile
+docker-compose.yaml
 # mkdocs documentation
 /site
-
+backend/rag/personal_info/*
+backend/Knowledge/*
+backend/vectorDB/RAG_PLAN.md
+backend/vectorDB/docker-compose.yml
+backend/rag/my_information_dev
+qdrant_storage
+versions
 # mypy
 .mypy_cache/
 .dmypy.json
 dmypy.json
-
+.deepeval
 # Pyre type checker
 .pyre/
 
