@@ -1,19 +1,19 @@
-import json
-import os
+import uuid
 
-STORE_PATH = os.path.join(os.path.dirname(__file__), "store.json")
+from sqlalchemy import select
+from sqlalchemy.orm import Session
+
+from long_memory.init_db import engine
+from long_memory.schema import Facts
 
 
 def load_facts() -> list[str]:
-    if not os.path.exists(STORE_PATH):
-        return []
-    with open(STORE_PATH) as f:
-        return json.load(f).get("facts", [])
+    with Session(engine) as session:
+        return list(session.scalars(select(Facts.fact).order_by(Facts.created_at)))
 
 
 def save_fact(fact: str) -> None:
-    facts = load_facts()
-    if fact not in facts:
-        facts.append(fact)
-        with open(STORE_PATH, "w") as f:
-            json.dump({"facts": facts}, f, indent=2)
+    with Session(engine) as session:
+        if session.scalar(select(Facts).where(Facts.fact == fact)) is None:
+            session.add(Facts(id=uuid.uuid4().hex[:8], fact=fact))
+            session.commit()
