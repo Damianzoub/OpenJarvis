@@ -1,4 +1,6 @@
 import { marked } from 'marked';
+import { PipecatClient } from '@pipecat-ai/client-js';
+import { SmallWebRTCTransport } from '@pipecat-ai/small-webrtc-transport';
 
 marked.use({ breaks: true, gfm: true });
 
@@ -232,6 +234,7 @@ setInterval(renderActivity, 60000); // keep "Xm ago" labels fresh
 function clearConversation() {
   messagesEl.innerHTML = "";
   chatHistory.length = 0;
+  sessionId = crypto.randomUUID();
 }
 
 document.addEventListener("keydown", (e) => {
@@ -299,6 +302,7 @@ function addMessage(text: string, sender: "user" | "jarvis"): HTMLElement {
 }
 
 const chatHistory:{role:string,content:string}[] = [];
+let sessionId = crypto.randomUUID();
 
 async function sendMessage(message: string) {
   chatHistory.push({ role: "user", content: message });
@@ -315,7 +319,7 @@ async function sendMessage(message: string) {
     const res = await fetch("http://localhost:8000/chat", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ messages: chatHistory }),
+      body: JSON.stringify({ messages: chatHistory, session_id: sessionId }),
     });
 
     const reader = res.body!.getReader();
@@ -398,46 +402,42 @@ document.querySelectorAll<HTMLButtonElement>(".card-action[data-prompt]").forEac
   });
 });
 
-// ── Voice input ────────────────────────────────────────────
-const SpeechRecognitionCtor =
-  (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+// ── Voice (Pipecat bot: python -m voice.main) ──────────────
+const VOICE_URL = "http://localhost:7860/api/offer";
 
-let recognition: any = null;
+const botAudio = new Audio();
+botAudio.autoplay = true;
+
+const voiceClient = new PipecatClient({
+  transport: new SmallWebRTCTransport(),
+  enableMic: true,
+  enableCam: false,
+  callbacks: {
+    onTrackStarted: (track, participant) => {
+      if (!participant?.local && track.kind === "audio") {
+        botAudio.srcObject = new MediaStream([track]);
+      }
+    },
+    onDisconnected: () => stopListening(),
+  },
+});
+
 let isListening = false;
 
-if (!SpeechRecognitionCtor) {
-  micBtn.classList.add("unavailable");
-  micBtn.title = "Speech recognition not available in this browser";
-} else {
-  recognition = new SpeechRecognitionCtor();
-  recognition.continuous      = false;
-  recognition.interimResults  = false;
-  recognition.lang            = "en-US";
-
-  recognition.onresult = (event: any) => {
-    const transcript = event.results[0][0].transcript.trim();
-    stopListening();
-    if (transcript) sendMessage(transcript);
-  };
-
-  recognition.onerror = () => {
-    stopListening();
-    setStatus("MIC ERROR");
-  };
-
-  recognition.onend = () => {
-    if (isListening) stopListening();
-  };
-}
-
-function startListening() {
-  if (!recognition || isListening) return;
+async function startListening() {
+  if (isListening) return;
   isListening = true;
   micBtn.classList.add("listening");
-  micBtn.textContent = "● REC";
+  micBtn.textContent = "● LIVE";
   micDot.classList.add("listening");
-  setStatus("LISTENING...");
-  recognition.start();
+  setStatus("CONNECTING...");
+  try {
+    await voiceClient.connect({ webrtcRequestParams: { endpoint: VOICE_URL } });
+    setStatus("LISTENING...");
+  } catch {
+    stopListening();
+    setStatus("VOICE OFFLINE");
+  }
 }
 
 function stopListening() {
@@ -447,11 +447,10 @@ function stopListening() {
   micBtn.textContent = "MIC";
   micDot.classList.remove("listening");
   setStatus("SYSTEM ONLINE");
-  try { recognition.stop(); } catch { /* already stopped */ }
+  voiceClient.disconnect();
 }
 
 function toggleMic() {
-  if (!recognition) return;
   isListening ? stopListening() : startListening();
 }
 
