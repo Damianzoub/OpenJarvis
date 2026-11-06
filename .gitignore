@@ -4,7 +4,7 @@ reminder.md
 __pycache__/
 *.py[codz]
 *$py.class
-
+backend/observability/calls.json
 # C extensions
 *.so
 .env.local
@@ -185,7 +185,7 @@ dmypy.json
 .deepeval
 # Pyre type checker
 .pyre/
-
+token.json.old
 # pytype static type analyzer
 .pytype/
 credentials.json
@@ -228,3 +228,5 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+backend/memory/store.json
+.DS_Store
