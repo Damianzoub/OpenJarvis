@@ -27,7 +27,7 @@
         <nav class="nav-list" aria-label="Dashboard sections">
           <a class="nav-item active" href="#card-system"><span class="nav-icon" aria-hidden="true">◆</span>Dashboard</a>
           <a class="nav-item" href="#card-conversation"><span class="nav-icon" aria-hidden="true">&gt;_</span>Chat</a>
-          <a class="nav-item" href="#card-calendar"><span class="nav-icon" aria-hidden="true">▤</span>Calendar</a>
+          <a class="nav-item" href="#card-calendar"><span class="nav-icon" aria-hidden="true">▤</span>Today</a>
           <a class="nav-item" href="#card-email"><span class="nav-icon" aria-hidden="true">✉</span>Email</a>
           <a class="nav-item" href="#card-weather"><span class="nav-icon" aria-hidden="true">☁</span>Weather</a>
           <a class="nav-item" href="#card-news"><span class="nav-icon" aria-hidden="true">≡</span>News</a>
@@ -97,10 +97,10 @@
             <div class="stat-detail" id="ram-detail"></div>
           </article>
 
-          <article class="card" id="card-calendar" data-agent="Calendar">
-            <h2 class="card-title"><span class="card-icon" aria-hidden="true">▤</span>Calendar<span class="card-badge"></span></h2>
-            <p class="card-empty">Ask Jarvis what's on your schedule.</p>
-            <button type="button" class="card-action" data-prompt="What's on my calendar today?">Check today</button>
+          <article class="card" id="card-calendar">
+            <h2 class="card-title"><span class="card-icon" aria-hidden="true">▤</span>Today's Things</h2>
+            <ul class="today-list" id="today-list"><li class="card-empty">Nothing left for today.</li></ul>
+            <button type="button" class="card-action" data-prompt="What do I have to do today?">Ask Jarvis</button>
           </article>
 
           <article class="card" id="card-email" data-agent="Email">
@@ -206,7 +206,7 @@
         <nav class="tab-bar" id="tab-bar" aria-label="Primary">
           <a class="tab-item active" href="#card-system" data-tab><span class="tab-icon" aria-hidden="true">◆</span><span class="tab-label">Dashboard</span></a>
           <a class="tab-item" href="#card-conversation" data-tab><span class="tab-icon" aria-hidden="true">&gt;_</span><span class="tab-label">Chat</span></a>
-          <a class="tab-item" href="#card-calendar" data-tab><span class="tab-icon" aria-hidden="true">▤</span><span class="tab-label">Calendar</span></a>
+          <a class="tab-item" href="#card-calendar" data-tab><span class="tab-icon" aria-hidden="true">▤</span><span class="tab-label">Today</span></a>
           <a class="tab-item" href="#card-files" data-tab><span class="tab-icon" aria-hidden="true">▣</span><span class="tab-label">Files</span></a>
           <button type="button" class="tab-item" id="tab-more" aria-haspopup="true" aria-expanded="false" aria-controls="sidebar-panel"><span class="tab-icon" aria-hidden="true">⋯</span><span class="tab-label">More</span></button>
         </nav>

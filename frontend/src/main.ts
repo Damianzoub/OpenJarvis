@@ -134,6 +134,35 @@ async function pollDueReminders() {
 }
 setInterval(pollDueReminders, 30000);
 
+// ── Today's Things — today's calendar events, in Greek time ──
+async function fetchToday() {
+  try {
+    const res = await fetch("http://localhost:8000/today");
+    const things = await res.json() as { time: string; title: string }[];
+    const list = document.querySelector<HTMLUListElement>("#today-list")!;
+    list.replaceChildren();
+    if (things.length === 0) {
+      const li = document.createElement("li");
+      li.className = "card-empty";
+      li.textContent = "Nothing left for today.";
+      list.append(li);
+      return;
+    }
+    for (const thing of things) {
+      const li = document.createElement("li");
+      const time = document.createElement("span");
+      time.className = "today-time";
+      time.textContent = thing.time;
+      li.append(time, thing.title);
+      list.append(li);
+    }
+  } catch {
+    // backend offline — keep the last list
+  }
+}
+fetchToday();
+setInterval(fetchToday, 60000);
+
 // ── Live dashboard cards + activity feed ─────────────────────
 const ACTIVITY_KEY = "jarvis_activity_log";
 const MAX_ACTIVITY = 30;

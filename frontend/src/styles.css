@@ -390,6 +390,9 @@ kbd {
 }
 .card-empty.has-data { color: #ccd8ff; }
 
+.today-list { list-style: none; margin: 0; padding: 0; flex: 1; font-size: 11px; line-height: 1.8; color: #ccd8ff; }
+.today-time { display: inline-block; min-width: 52px; color: var(--cyan); }
+
 /* ── Activity feed ────────────────────────────────────────── */
 .activity-list { list-style: none; display: flex; flex-direction: column; gap: 8px; }
 .activity-empty { font-size: 11px; color: var(--cyan-dim-text); }
