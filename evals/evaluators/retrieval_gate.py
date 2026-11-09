@@ -14,10 +14,10 @@ from dotenv import load_dotenv
 
 load_dotenv(BACKEND / ".env")
 
-from backend.rag.config import configure_llamaIndex
-from backend.rag.online import load_index
-from backend.rag.reranker import rerank_cross_embed
-from backend.rag.retriever import hybrid_retriever
+from rag.config import configure_llamaIndex
+from rag.online import load_index
+from rag.reranker import rerank_cross_embed
+from rag.retriever import hybrid_retriever
 
 # (query, text that must appear in the top 3 chunks) — copied from rag/personal_info/bio.md
 GOLDEN = [
