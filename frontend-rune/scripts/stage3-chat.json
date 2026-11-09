@@ -1,0 +1,7 @@
+{"events": [
+  {"t": 0.2, "type": "tap", "key": "chat-input"},
+  {"t": 0.4, "type": "type", "text": "What is 2 plus 2? Answer with a short markdown list of two items."},
+  {"t": 4.0, "type": "key", "name": "Enter"},
+  {"t": 4.5, "type": "tap", "key": "chat-input"},
+  {"t": 6.0, "type": "mark", "name": "end"}
+]}

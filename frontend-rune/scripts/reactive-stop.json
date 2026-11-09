@@ -1,0 +1,6 @@
+{"events": [
+  {"t": 0.2, "type": "tap", "key": "chat-input"}, {"t": 0.3, "type": "type", "text": "slow weather please"},
+  {"t": 1.5, "type": "key", "name": "Enter"},
+  {"t": 2.6, "type": "mark", "name": "inflight"},
+  {"t": 3.0, "type": "key", "name": "Escape"},
+  {"t": 3.6, "type": "mark", "name": "stopped"}]}

@@ -1,0 +1,10 @@
+{"events": [
+  {"t": 0.3, "type": "tap", "key": "card-weather-action"},
+  {"t": 2.0, "type": "mark", "name": "replied"},
+  {"t": 2.2, "type": "tap", "key": "nav-weather"},
+  {"t": 3.0, "type": "mark", "name": "card"},
+  {"t": 3.5, "type": "key", "name": "l", "ctrl": true},
+  {"t": 3.7, "type": "shortcut", "chord": "cmd+shift+j"},
+  {"t": 3.9, "type": "tap", "key": "chat-input"},
+  {"t": 5.0, "type": "mark", "name": "end"}
+]}

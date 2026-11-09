@@ -1,0 +1,1 @@
+{"events": [{"t": 0.3, "type": "tap", "key": "card-weather/more"}, {"t": 0.6, "type": "move", "key": "card-weather/more"}, {"t": 1.2, "type": "mark", "name": "end"}]}

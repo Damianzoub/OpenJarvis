@@ -1,0 +1,20 @@
+[package]
+name = "jarvis-hud"
+version = "0.0.0"
+edition = "2024"
+publish = false
+
+[dependencies]
+rune = { git = "https://github.com/anomalyco/rune", rev = "3ff3cc6152b9034a1d996e3a5575c51fab3b56b8", features = ["native-file-dialog"] }
+rune-kit = { git = "https://github.com/anomalyco/rune", rev = "3ff3cc6152b9034a1d996e3a5575c51fab3b56b8", features = ["markdown"] }
+rune-theme-opencode = { git = "https://github.com/anomalyco/rune", rev = "3ff3cc6152b9034a1d996e3a5575c51fab3b56b8" }
+rune-notify = { git = "https://github.com/anomalyco/rune", rev = "3ff3cc6152b9034a1d996e3a5575c51fab3b56b8" }
+ureq = { version = "2", features = ["json"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+uuid = { version = "1", features = ["v4"] }
+dirs = "5"
+chrono = "0.4"
+
+[profile.release]
+incremental = true

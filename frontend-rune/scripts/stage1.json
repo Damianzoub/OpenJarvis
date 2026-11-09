@@ -1,0 +1,5 @@
+{"events": [
+  {"t": 0.2, "type": "tap", "key": "nav-reminders"},
+  {"t": 1.2, "type": "key", "name": "m", "ctrl": true},
+  {"t": 1.6, "type": "mark", "name": "end"}
+]}

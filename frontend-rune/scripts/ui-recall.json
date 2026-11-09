@@ -1,0 +1,4 @@
+{"events": [
+  {"t": 0.2, "type": "tap", "key": "chat-input"}, {"t": 0.3, "type": "type", "text": "remind me to stretch"},
+  {"t": 2.5, "type": "key", "name": "Enter"}, {"t": 3.5, "type": "tap", "key": "chat-input"},
+  {"t": 3.7, "type": "key", "name": "Up"}, {"t": 4.2, "type": "mark", "name": "end"}]}
