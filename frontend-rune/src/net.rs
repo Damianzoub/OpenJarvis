@@ -19,6 +19,11 @@ pub fn backend() -> String {
     std::env::var("JARVIS_BACKEND").unwrap_or_else(|_| "http://localhost:8000".into())
 }
 
+/// The Pipecat voice bot (`python -m voice.main`), a separate process from the backend.
+pub fn voice_url() -> String {
+    std::env::var("JARVIS_VOICE_URL").unwrap_or_else(|_| "http://localhost:7860".into())
+}
+
 pub enum Event {
     Stats(Stats),
     Today(Vec<Thing>),
@@ -26,6 +31,8 @@ pub enum Event {
     Due(Vec<String>),
     /// A poll failed: the backend is unreachable.
     Offline,
+    /// Whether the voice bot's port answered at all (any HTTP status, not just 2xx).
+    VoiceStatus(bool),
     /// A chat stream event, tagged with the request it belongs to (see `start_chat`).
     Chat(u64, ChatEvent),
 }
@@ -87,6 +94,14 @@ pub fn fetch_stats(tx: &Sender<Event>, wake: &rune::Waker, inflight: &Inflight) 
         None => Event::Offline,
     };
     send(tx, wake, inflight, ev);
+}
+
+/// Reachability only, no audio: a non-2xx response (the bot has no route at `/`) still proves
+/// the process is alive; only a connection failure counts as down.
+pub fn fetch_voice_status(tx: &Sender<Event>, wake: &rune::Waker, inflight: &Inflight) {
+    inflight.start();
+    let up = matches!(agent().get(&voice_url()).timeout(Duration::from_secs(2)).call(), Ok(_) | Err(ureq::Error::Status(_, _)));
+    send(tx, wake, inflight, Event::VoiceStatus(up));
 }
 
 pub fn fetch_today(tx: &Sender<Event>, wake: &rune::Waker, inflight: &Inflight) {
@@ -161,6 +176,7 @@ pub fn start_pollers(tx: Sender<Event>, wake: rune::Waker, inflight: Inflight, o
         let mut tick: u64 = 0;
         loop {
             fetch_stats(&tx, &wake, &inflight);
+            fetch_voice_status(&tx, &wake, &inflight);
             if tick % 20 == 0 { fetch_today(&tx, &wake, &inflight); }
             if tick % 200 == 0 { fetch_weather(&tx, &wake, &inflight); }
             if tick % 10 == 0 && tick > 0 { fetch_due(&tx, &wake, &inflight); }

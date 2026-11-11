@@ -67,6 +67,7 @@ fn apply(s: &mut State, ev: Event) {
             }
         }
         Event::Today(things) => s.today = things,
+        Event::VoiceStatus(up) => s.voice_up = up,
         Event::Weather(w) => s.weather = Some(w),
         Event::Due(texts) => {
             for (i, text) in texts.iter().enumerate() {
@@ -96,14 +97,20 @@ fn poll(s: &mut State, _t: f64, tx: &mut Tx) -> bool {
     }
     // Headless runs have a virtual clock, so wait for real answers before drawing the frame.
     // `chat_gen > 0`: a request really went out (a demo scene's "busy" has nothing to wait for).
-    let streaming = s.busy && s.chat_gen.load(std::sync::atomic::Ordering::SeqCst) > 0;
-    if headless() && (s.inflight.count() > 0 || streaming) {
+    // Loops, not just one recv: a poll round fires several concurrent fetches (stats, voice
+    // status, …), and only one frame ever gets drawn here, so every one of them has to land
+    // before it does — otherwise whichever happens to arrive first wins and the rest render
+    // with their stale defaults.
+    let streaming = |s: &State| s.busy && s.chat_gen.load(std::sync::atomic::Ordering::SeqCst) > 0;
+    if headless() {
         // How long a headless frame waits for the next real event (ms). Long by default so a
         // screenshot "after" a reply has it; tests of in-flight states (STOP) shorten it.
         let wait = std::env::var("JARVIS_HEADLESS_WAIT_MS").ok().and_then(|v| v.parse().ok()).unwrap_or(120_000);
-        if let Ok(ev) = s.rx.recv_timeout(Duration::from_millis(wait)) {
-            apply(s, ev);
-            changed = true;
+        while s.inflight.count() > 0 || streaming(s) {
+            match s.rx.recv_timeout(Duration::from_millis(wait)) {
+                Ok(ev) => { apply(s, ev); changed = true; }
+                Err(_) => break,
+            }
         }
     }
     while let Ok(ev) = s.rx.try_recv() {

@@ -158,7 +158,8 @@ fn topbar(s: &State, cx: &mut Cx<State>) -> El {
         .child(cards::meter("RAM", s.stats.as_ref().map(|st| st.ram), 85.0, ram_detail, !compact));
     let lights = row().key("indicators").gap(8.0).center_y()
         .child(indicator("ind-api", "API", api.0, api.1))
-        .child(indicator("ind-voice", "VOICE", Light::Off, "Voice isn't ported to the Rune app yet"))
+        .child(indicator("ind-voice", "VOICE", if s.voice_up { Light::On } else { Light::Off },
+            if s.voice_up { "Voice bot reachable — not wired into this app yet" } else { "Voice bot unreachable" }))
         .child(indicator("ind-mic", "MIC", if s.mic_on { Light::Live } else { Light::Off }, if s.mic_on { "Mic on (state only)" } else { "Mic off" }));
     row().key("topbar").w_full().center_y().gap(16.0).pb(12.0)
         .child(left)

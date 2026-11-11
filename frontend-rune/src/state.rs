@@ -118,6 +118,8 @@ pub struct State {
     pub status: String,
     pub banner: Option<String>,
     pub mic_on: bool,
+    /// Whether the Pipecat voice bot's port answered the last check.
+    pub voice_up: bool,
     pub confirm_close: bool,
     /// The reply whose COPY button was just pressed (shows "COPIED" briefly).
     pub copied: Option<(u64, std::time::Instant)>,
@@ -170,6 +172,7 @@ impl State {
             status: "SYSTEM ONLINE".into(),
             banner: None,
             mic_on: false,
+            voice_up: false,
             confirm_close: false,
             copied: None,
             open_activity: None,
