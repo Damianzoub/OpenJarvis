@@ -7,7 +7,9 @@ python-dotenv
 openai
 httpx
 psutil
-bu-agent-sdk
+langgraph
+langchain-core
+langchain-openai
 # Browser Use agent SDK
 browser-use
 playwright
@@ -15,3 +17,12 @@ google-api-python-client==2.188.0
 google-auth-oauthlib==1.2.4
 google-auth-httplib2==0.3.1
 redis
+sqlalchemy
+psycopg[binary]
+alembic
+qdrant-client"[fastembed]"
+guardrails-ai
+llama-index
+yfinance
+langfuse>=5.0
+laya
