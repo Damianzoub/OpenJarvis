@@ -1,5 +1,5 @@
 from .init_db import Base
-from sqlalchemy import Integer,String,Column,Float,ForeignKey,ForeignKeyConstraint,Index,UniqueConstraint,DateTime,func,Numeric,Boolean
+from sqlalchemy import Integer,String,Column,Float,ForeignKey,ForeignKeyConstraint,Index,UniqueConstraint,DateTime,func,Numeric,Boolean,BigInteger
 
 class Facts(Base):
     __tablename__="facts"
@@ -13,6 +13,27 @@ class Goals(Base):
     text = Column(String,nullable=False)
     target_date =Column(String)
     created_at = Column(DateTime(timezone=True),nullable=False,default=func.now())
+
+
+class Conversations(Base):
+    __tablename__="conversations"
+    id = Column(String,primary_key=True)
+    title=Column(String,nullable=False)
+    created_at = Column(DateTime(timezone=True),nullable=False,default=func.now())
+    updated_at = Column(DateTime(timezone=True),nullable=False,default=func.now())
+
+class Messages(Base):
+    __tablename__="messages"
+    id = Column(BigInteger,primary_key=True)
+    conversation_id = Column(String,ForeignKey("conversations.id",ondelete="CASCADE"),nullable=False)
+    role = Column(String,nullable=False)
+    content = Column(String,nullable=False)
+    agent =Column(String)
+    created_at = Column(DateTime(timezone=True),nullable=False,default=func.now())
+
+    __table_args__ = (
+        Index("idx_messages_conversation_id","conversation_id","created_at"),
+    )
 
 class Journal_Entries(Base):
     __tablename__="journal_entries"
